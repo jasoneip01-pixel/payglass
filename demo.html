@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Demo · PayGlass</title>
+<style>
+  :root {
+    --bg: #0a0a0f; --surface: #14141f; --border: #252540;
+    --text: #e0e0f0; --muted: #707090;
+    --green: #00e676; --yellow: #ffd740; --red: #ff5252;
+    --blue: #448aff; --purple: #b388ff; --cyan: #18ffff;
+    --radius: 10px; --max-w: 820px;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--bg); color: var(--text); line-height: 1.7;
+  }
+  nav {
+    background: var(--surface); border-bottom: 1px solid var(--border);
+    padding: 0 24px; position: sticky; top: 0; z-index: 10;
+  }
+  nav .inner { max-width: var(--max-w); margin: 0 auto; display: flex; gap: 24px; align-items: center; height: 56px; }
+  nav a { color: var(--muted); text-decoration: none; font-size: 0.9rem; transition: color 0.2s; }
+  nav a:hover, nav a.active { color: var(--text); }
+  nav .brand { font-weight: 700; background: linear-gradient(135deg, var(--cyan), var(--purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 1.1rem; }
+
+  main { max-width: var(--max-w); margin: 0 auto; padding: 48px 24px; }
+  h1 { font-size: 2rem; margin-bottom: 8px; }
+  .subtitle { color: var(--muted); margin-bottom: 40px; }
+  h2 { font-size: 1.3rem; font-weight: 600; margin: 40px 0 20px; padding-top: 24px; border-top: 1px solid var(--border); }
+  h3 { font-size: 1.05rem; font-weight: 600; margin: 20px 0 10px; }
+
+  .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin: 24px 0; }
+  .summary-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 20px; text-align: center;
+  }
+  .summary-card .num { font-size: 2rem; font-weight: 700; }
+  .summary-card .lbl { font-size: 0.8rem; color: var(--muted); margin-top: 4px; }
+  .num.cyan { color: var(--cyan); }
+  .num.green { color: var(--green); }
+  .num.red { color: var(--red); }
+  .num.purple { color: var(--purple); }
+
+  .track-section { margin: 32px 0; }
+  .track-label {
+    display: inline-block; padding: 4px 12px; border-radius: 4px;
+    font-size: 0.8rem; font-weight: 600; margin-bottom: 16px;
+  }
+  .track-x402 { background: rgba(24,255,255,0.15); color: var(--cyan); }
+  .track-nano { background: rgba(179,136,255,0.15); color: var(--purple); }
+  .track-spt { background: rgba(68,138,255,0.15); color: var(--blue); }
+
+  .scenario {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 20px; margin: 12px 0;
+  }
+  .scenario-header {
+    display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;
+  }
+  .scenario-name { font-weight: 600; font-size: 1rem; }
+  .scenario-amount { font-size: 0.9rem; color: var(--muted); }
+  .scenario-detail { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 0.85rem; }
+  .detail-k { color: var(--muted); }
+  .detail-v { color: var(--text); }
+
+  .pipeline-mini {
+    display: flex; align-items: center; gap: 4px; margin-top: 12px; flex-wrap: wrap;
+  }
+  .pmin-step {
+    background: var(--bg); border: 1px solid var(--border);
+    border-radius: 4px; padding: 4px 8px; font-size: 0.72rem;
+    white-space: nowrap;
+  }
+  .pmin-arrow { color: var(--muted); font-size: 0.8rem; }
+
+  .error-card {
+    background: rgba(255,82,82,0.08); border: 1px solid rgba(255,82,82,0.3);
+    border-radius: var(--radius); padding: 20px; margin: 12px 0;
+  }
+  .error-card .err-label { color: var(--red); font-weight: 600; margin-bottom: 8px; }
+
+  pre { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; overflow-x: auto; margin: 12px 0; font-size: 0.85rem; }
+  code { background: var(--surface); padding: 2px 6px; border-radius: 4px; font-size: 0.85rem; }
+
+  .run-btn {
+    display: inline-block; padding: 10px 24px; background: linear-gradient(135deg, var(--cyan), var(--purple));
+    color: #fff; border-radius: 8px; font-weight: 600; text-decoration: none; border: none; cursor: pointer; font-size: 0.95rem;
+  }
+  .run-btn:hover { opacity: 0.9; }
+
+  footer {
+    text-align: center; padding: 48px 24px; border-top: 1px solid var(--border);
+    color: var(--muted); font-size: 0.85rem;
+  }
+  footer a { color: var(--cyan); text-decoration: none; }
+
+  @media (max-width: 600px) {
+    .scenario-detail { grid-template-columns: 1fr; }
+    .summary-grid { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="inner">
+    <a href="index.html" class="brand">PayGlass</a>
+    <a href="product.html">产品定义书</a>
+    <a href="docs.html">技术文档</a>
+    <a href="demo.html" class="active">Demo</a>
+    <a href="dashboard/">Dashboard</a>
+  </div>
+</nav>
+
+<main>
+<h1>🧪 Demo</h1>
+<p class="subtitle">8 个支付场景，覆盖全部 3 条轨道。一键运行，即刻观测。</p>
+
+<!-- Summary -->
+<div class="summary-grid">
+  <div class="summary-card"><div class="num cyan">8</div><div class="lbl">支付场景</div></div>
+  <div class="summary-card"><div class="num green">3</div><div class="lbl">协议轨道</div></div>
+  <div class="summary-card"><div class="num purple">$141.00</div><div class="lbl">总交易量</div></div>
+  <div class="summary-card"><div class="num red">1</div><div class="lbl">验证捕获</div></div>
+</div>
+
+<a href="https://github.com/jasoneip01-pixel/payglass" class="run-btn">▶ 运行 Demo：python3 demo.py</a>
+
+<!-- Track 1: x402 -->
+<div class="track-section">
+  <span class="track-label track-x402">Track 1 · x402 Protocol · 3 scenarios</span>
+
+  <div class="scenario">
+    <div class="scenario-header">
+      <div class="scenario-name">🅰️ Pay-per-Call LLM API</div>
+      <div class="scenario-amount">$0.01</div>
+    </div>
+    <div class="scenario-detail">
+      <div class="detail-k">Resource</div><div class="detail-v">https://api.openai.com/v1/chat/completions</div>
+      <div class="detail-k">Agent</div><div class="detail-v">research-agent-42</div>
+      <div class="detail-k">Chain</div><div class="detail-v">arbitrum</div>
+      <div class="detail-k">Events</div><div class="detail-v">7 (signature → verification → batch → settled)</div>
+    </div>
+    <div class="pipeline-mini">
+      <div class="pmin-step">402</div><div class="pmin-arrow">→</div>
+      <div class="pmin-step">签名</div><div class="pmin-arrow">→</div>
+      <div class="pmin-step">验证</div><div class="pmin-arrow">→</div>
+      <div class="pmin-step">交付</div><div class="pmin-arrow">→</div>
+      <div class="pmin-step">批量</div><div class="pmin-arrow">→</div>
+      <div class="pmin-step">✅ 结算</div>
+    </div>
+  </div>
+
+  <div class="scenario">
+    <div class="scenario-header">
+      <div class="scenario-name">🅱️ Data Oracle Query</div>
+      <div class="scenario-amount">$0.02</div>
+    </div>
+    <div class="scenario-detail">
+      <div class="detail-k">Resource</div><div class="detail-v">https://oracle.chainlink.com/eth-usd</div>
+      <div class="detail-k">Agent</div><div class="detail-v">trading-agent-7</div>
+      <div class="detail-k">Chain</div><div class="detail-v">arbitrum</div>
+    </div>
+  </div>
+
+  <div class="scenario">
+    <div class="scenario-header">
+      <div class="scenario-name">🅲 Batch Model Inference</div>
+      <div class="scenario-amount">$25.00</div>
+    </div>
+    <div class="scenario-detail">
+      <div class="detail-k">Resource</div><div class="detail-v">https://inference.example.com/batch/v1</div>
+      <div class="detail-k">Agent</div><div class="detail-v">analytics-agent-3</div>
+      <div class="detail-k">Chain</div><div class="detail-v">optimism</div>
+    </div>
+  </div>
+</div>
+
+<!-- Track 2: Nanopayments -->
+<div class="track-section">
+  <span class="track-label track-nano">Track 2 · Circle Nanopayments · 4 scenarios</span>
+
+  <div class="scenario">
+    <div class="scenario-header">
+      <div class="scenario-name">🅳 Sub-Cent Price Feed</div>
+      <div class="scenario-amount">$0.000050</div>
+    </div>
+    <div class="scenario-detail">
+      <div class="detail-k">Buyer</div><div class="detail-v">data-agent-7</div>
+      <div class="detail-k">Seller</div><div class="detail-v">https://feeds.circle.com/btc-usd</div>
+      <div class="detail-k">Chain</div><div class="detail-v">arbitrum</div>
+      <div class="detail-k">Highlight</div><div class="detail-v">5 hundred-thousandths — only possible with Nanopayments</div>
+    </div>
+    <div class="pipeline-mini">
+      <div class="pmin-step">存款</div><div class="pmin-arrow">→</div>
+      <div class="pmin-step">EIP-3009</div><div class="pmin-arrow">→</div>
+      <div class="pmin-step">TEE 验证</div><div class="pmin-arrow">→</div>
+      <div class="pmin-step">扣减</div><div class="pmin-arrow">→</div>
+      <div class="pmin-step">批量</div><div class="pmin-arrow">→</div>
+      <div class="pmin-step">✅ 结算</div>
+    </div>
+  </div>
+
+  <div class="scenario">
+    <div class="scenario-header">
+      <div class="scenario-name">🅴 API Metering at Scale</div>
+      <div class="scenario-amount">$0.001</div>
+    </div>
+    <div class="scenario-detail">
+      <div class="detail-k">Buyer</div><div class="detail-v">monitor-agent-1</div>
+      <div class="detail-k">Seller</div><div class="detail-v">https://metrics.example.com/api/v2/query</div>
+    </div>
+  </div>
+
+  <div class="error-card">
+    <div class="err-label">⚠️ 验证失败捕获</div>
+    <div class="scenario">
+      <div class="scenario-header">
+        <div class="scenario-name">🅵 Below Minimum — Validation Gate</div>
+        <div class="scenario-amount">$0.0000005</div>
+      </div>
+      <div class="scenario-detail">
+        <div class="detail-k">Buyer</div><div class="detail-v">test-agent-0</div>
+        <div class="detail-k">Seller</div><div class="detail-v">https://test.example.com/ping</div>
+        <div class="detail-k">Result</div><div class="detail-v" style="color:var(--red);">❌ Amount $5e-07 below minimum $1e-06</div>
+        <div class="detail-k">Events</div><div class="detail-v">1 (validation_failed → stopped)</div>
+      </div>
+    </div>
+    <p style="font-size:0.85rem;color:var(--muted);margin-top:8px;">
+      这是<strong>正确的失败</strong>——PayGlass 的验证闸门在第一步就拦截了非法支付，不浪费后续计算资源。
+    </p>
+  </div>
+
+  <div class="scenario">
+    <div class="scenario-header">
+      <div class="scenario-name">🅶 Wallet Top-Up (Large Nanopayment)</div>
+      <div class="scenario-amount">$99.98</div>
+    </div>
+    <div class="scenario-detail">
+      <div class="detail-k">Buyer</div><div class="detail-v">treasury-agent-0</div>
+      <div class="detail-k">Seller</div><div class="detail-v">https://gateway.circle.com/deposit</div>
+      <div class="detail-k">Note</div><div class="detail-v">Nanopayments handles any amount — micro and macro</div>
+    </div>
+  </div>
+</div>
+
+<!-- Track 3: Stripe SPT -->
+<div class="track-section">
+  <span class="track-label track-spt">Track 3 · Stripe SPT (Stub) · 1 scenario</span>
+
+  <div class="scenario">
+    <div class="scenario-header">
+      <div class="scenario-name">🅷 E-Commerce Checkout</div>
+      <div class="scenario-amount">$15.99</div>
+    </div>
+    <div class="scenario-detail">
+      <div class="detail-k">Resource</div><div class="detail-v">https://shop.example.com/api/checkout</div>
+      <div class="detail-k">Agent</div><div class="detail-v">shopping-agent-3</div>
+      <div class="detail-k">Payment</div><div class="detail-v">Link Agent Wallet</div>
+      <div class="detail-k">Status</div><div class="detail-v"><span style="color:var(--yellow);">🟡 Stub — awaiting Stripe SPT public beta</span></div>
+    </div>
+    <div class="pipeline-mini">
+      <div class="pmin-step">Session</div><div class="pmin-arrow">→</div>
+      <div class="pmin-step">Token</div><div class="pmin-arrow">→</div>
+      <div class="pmin-step">Auth</div><div class="pmin-arrow">→</div>
+      <div class="pmin-step">Payment</div><div class="pmin-arrow">→</div>
+      <div class="pmin-step">✅ Settled</div>
+    </div>
+  </div>
+</div>
+
+<!-- Batch Summary -->
+<h2>📦 批量结算汇总</h2>
+<div class="scenario">
+  <div class="scenario-header">
+    <div class="scenario-name">x402 Batch #001</div>
+    <div class="scenario-amount">2 payments · arbitrum</div>
+  </div>
+  <div class="scenario-detail">
+    <div class="detail-k">Payments</div><div class="detail-v">LLM API ($0.01) + Oracle ($0.02)</div>
+    <div class="detail-k">Tx Hash</div><div class="detail-v"><code>0xabc123...settle1</code></div>
+  </div>
+</div>
+<div class="scenario">
+  <div class="scenario-header">
+    <div class="scenario-name">x402 Batch #002</div>
+    <div class="scenario-amount">1 payment · optimism</div>
+  </div>
+  <div class="scenario-detail">
+    <div class="detail-k">Payment</div><div class="detail-v">Batch Inference ($25.00)</div>
+    <div class="detail-k">Tx Hash</div><div class="detail-v"><code>0xdef456...settle2</code></div>
+  </div>
+</div>
+<div class="scenario">
+  <div class="scenario-header">
+    <div class="scenario-name">Nanopayments Batch #001</div>
+    <div class="scenario-amount">3 payments · $0.02 gas total</div>
+  </div>
+  <div class="scenario-detail">
+    <div class="detail-k">Payments</div><div class="detail-v">$0.000050 + $0.001 + $99.98</div>
+    <div class="detail-k">Gas Cost</div><div class="detail-v" style="color:var(--green);">$0.02 total (≈$0.007 per payment)</div>
+  </div>
+</div>
+
+<h2>🚀 运行 Demo</h2>
+<pre>git clone https://github.com/jasoneip01-pixel/payglass.git
+cd payglass
+<span class="code-cmt"># 8 scenarios, 3 tracks, 1 validation catch</span>
+python3 demo.py
+
+<span class="code-cmt"># View the live dashboard</span>
+python3 -m http.server 8080 -d dashboard/
+<span class="code-cmt"># → http://localhost:8080</span></pre>
+
+<p style="color:var(--muted);margin-top:16px;">
+  运行后 demo.py 会自动生成 <code>dashboard/data.json</code>，Dashboard 页面会自动加载最新数据。
+</p>
+
+</main>
+
+<footer>
+  <p>PayGlass v0.1.0 · <a href="https://github.com/jasoneip01-pixel/payglass">GitHub</a> · <a href="product.html">产品定义书</a> · <a href="docs.html">技术文档</a></p>
+</footer>
+</body>
+</html>
