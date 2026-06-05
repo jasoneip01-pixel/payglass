@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PayGlass — Agent Payment Observatory</title>
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #14141f;
+    --border: #252540;
+    --text: #e0e0f0;
+    --muted: #707090;
+    --green: #00e676;
+    --yellow: #ffd740;
+    --red: #ff5252;
+    --blue: #448aff;
+    --purple: #b388ff;
+    --cyan: #18ffff;
+    --radius: 8px;
+    --gap: 12px;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 24px;
+  }
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+  }
+  h1 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    background: linear-gradient(135deg, var(--cyan), var(--purple));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .subtitle { color: var(--muted); font-size: 0.85rem; margin-top: 4px; }
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: var(--gap);
+    margin-bottom: 24px;
+  }
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+  }
+  .stat-card .label { font-size: 0.75rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
+  .stat-card .value { font-size: 1.5rem; font-weight: 700; margin-top: 4px; }
+  .stat-card .delta { font-size: 0.8rem; margin-top: 4px; }
+  .tracks {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: var(--gap);
+    margin-bottom: 24px;
+  }
+  .track {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+  }
+  .track h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .track .dot { width: 8px; height: 8px; border-radius: 50%; }
+  .dot.x402 { background: var(--cyan); }
+  .dot.nano { background: var(--purple); }
+  .dot.spt { background: var(--blue); }
+  .track .metric-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.85rem;
+  }
+  .track .metric-row:last-child { border-bottom: none; }
+  .track .metric-label { color: var(--muted); }
+  .pipeline {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+    margin-bottom: 24px;
+  }
+  .pipeline h3 { font-size: 1rem; font-weight: 600; margin-bottom: 12px; }
+  .pipe-flow {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    overflow-x: auto;
+    padding: 8px 0;
+  }
+  .pipe-step {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 10px 14px;
+    text-align: center;
+    min-width: 120px;
+    flex-shrink: 0;
+  }
+  .pipe-step .step-name { font-size: 0.8rem; font-weight: 600; }
+  .pipe-step .step-time { font-size: 0.7rem; color: var(--muted); margin-top: 2px; }
+  .pipe-step .step-status { font-size: 0.7rem; font-weight: 600; margin-top: 4px; }
+  .pipe-step .status-verified { color: var(--green); }
+  .pipe-step .status-pending { color: var(--yellow); }
+  .pipe-step .status-failed { color: var(--red); }
+  .pipe-step .status-settled { color: var(--cyan); }
+  .pipe-arrow { color: var(--muted); font-size: 1.2rem; flex-shrink: 0; }
+  .traces-table {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+  .traces-table table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+  .traces-table th {
+    text-align: left;
+    padding: 10px 14px;
+    color: var(--muted);
+    font-weight: 500;
+    text-transform: uppercase;
+    font-size: 0.7rem;
+    letter-spacing: 0.05em;
+    border-bottom: 1px solid var(--border);
+  }
+  .traces-table td { padding: 10px 14px; border-bottom: 1px solid var(--border); }
+  .traces-table tr:last-child td { border-bottom: none; }
+  .badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    font-weight: 600;
+  }
+  .badge-x402 { background: rgba(24,255,255,0.15); color: var(--cyan); }
+  .badge-nano { background: rgba(179,136,255,0.15); color: var(--purple); }
+  .badge-spt { background: rgba(68,138,255,0.15); color: var(--blue); }
+  .badge-ok { background: rgba(0,230,118,0.15); color: var(--green); }
+  .badge-err { background: rgba(255,82,82,0.15); color: var(--red); }
+  .badge-pend { background: rgba(255,215,64,0.15); color: var(--yellow); }
+  .empty-state {
+    text-align: center;
+    padding: 48px 24px;
+    color: var(--muted);
+  }
+  .empty-state .icon { font-size: 2.5rem; margin-bottom: 12px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>🔍 PayGlass</h1>
+    <div class="subtitle">Agent Payment Observatory — Stripe SPT · x402 · Circle Nanopayments</div>
+  </div>
+  <div style="font-size:0.8rem;color:var(--muted);">v0.1.0</div>
+</header>
+
+<!-- Stats Grid -->
+<div class="stats-grid" id="statsGrid">
+  <div class="stat-card">
+    <div class="label">Total Payments</div>
+    <div class="value" id="totalPayments">0</div>
+  </div>
+  <div class="stat-card">
+    <div class="label">Total Volume (USDC)</div>
+    <div class="value" id="totalVolume">$0.00</div>
+  </div>
+  <div class="stat-card">
+    <div class="label">Avg Latency</div>
+    <div class="value" id="avgLatency">0ms</div>
+  </div>
+  <div class="stat-card">
+    <div class="label">Error Rate</div>
+    <div class="value" id="errorRate">0%</div>
+  </div>
+</div>
+
+<!-- Three Tracks -->
+<div class="tracks" id="tracks">
+  <div class="track" id="track-x402">
+    <h3><span class="dot x402"></span> x402 Protocol</h3>
+    <div class="metric-row"><span class="metric-label">Payments</span><span id="x402-count">0</span></div>
+    <div class="metric-row"><span class="metric-label">Volume</span><span id="x402-volume">$0.00</span></div>
+    <div class="metric-row"><span class="metric-label">Avg Latency</span><span id="x402-latency">0ms</span></div>
+    <div class="metric-row"><span class="metric-label">Errors</span><span id="x402-errors">0</span></div>
+  </div>
+  <div class="track" id="track-nano">
+    <h3><span class="dot nano"></span> Circle Nanopayments</h3>
+    <div class="metric-row"><span class="metric-label">Payments</span><span id="nano-count">0</span></div>
+    <div class="metric-row"><span class="metric-label">Volume</span><span id="nano-volume">$0.00</span></div>
+    <div class="metric-row"><span class="metric-label">Avg Latency</span><span id="nano-latency">0ms</span></div>
+    <div class="metric-row"><span class="metric-label">Errors</span><span id="nano-errors">0</span></div>
+  </div>
+  <div class="track" id="track-spt">
+    <h3><span class="dot spt"></span> Stripe SPT</h3>
+    <div class="metric-row"><span class="metric-label">Payments</span><span id="spt-count">0</span></div>
+    <div class="metric-row"><span class="metric-label">Volume</span><span id="spt-volume">$0.00</span></div>
+    <div class="metric-row"><span class="metric-label">Avg Latency</span><span id="spt-latency">0ms</span></div>
+    <div class="metric-row"><span class="metric-label">Errors</span><span id="spt-errors">0</span></div>
+  </div>
+</div>
+
+<!-- Payment Pipeline Visualization -->
+<div class="pipeline" id="pipeline">
+  <h3>📡 Live Payment Pipeline</h3>
+  <div id="pipelineEmpty" class="empty-state">
+    <div class="icon">🔍</div>
+    <div>No traces yet. Run the PayGlass engine to populate.</div>
+  </div>
+  <div class="pipe-flow" id="pipeFlow" style="display:none;"></div>
+</div>
+
+<!-- Recent Traces -->
+<div class="traces-table" id="tracesSection">
+  <table>
+    <thead>
+      <tr>
+        <th>Trace ID</th>
+        <th>Protocol</th>
+        <th>Amount</th>
+        <th>Events</th>
+        <th>Latency</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody id="tracesBody">
+      <tr><td colspan="6"><div class="empty-state"><div class="icon">📋</div><div>No traces recorded</div></div></td></tr>
+    </tbody>
+  </table>
+</div>
+
+<script>
+// ── Dashboard Engine ──────────────────────────────────────────
+
+const STATE = {
+  traces: [],
+  dashboard: null,
+};
+
+function fmtUSDC(amount) {
+  if (amount < 0.01) return `$${amount.toFixed(6)}`;
+  return `$${amount.toFixed(2)}`;
+}
+
+function fmtLatency(ms) {
+  if (ms === null || ms === undefined) return '—';
+  if (ms < 1000) return `${ms}ms`;
+  return `${(ms/1000).toFixed(1)}s`;
+}
+
+function renderAll(data) {
+  STATE.dashboard = data;
+  renderStats(data);
+  renderTracks(data);
+  renderTraces(data.recent_traces || []);
+  renderPipeline(data.recent_traces || []);
+}
+
+function renderStats(d) {
+  document.getElementById('totalPayments').textContent = d.total_payments || 0;
+  document.getElementById('totalVolume').textContent = fmtUSDC(d.total_volume_usdc || 0);
+
+  const traces = d.recent_traces || [];
+  const latencies = traces.filter(t => t.latency_ms).map(t => t.latency_ms);
+  const avgLat = latencies.length ? Math.round(latencies.reduce((a,b)=>a+b,0)/latencies.length) : 0;
+  document.getElementById('avgLatency').textContent = avgLat ? fmtLatency(avgLat) : '—';
+
+  const errors = traces.filter(t => t.errors).length;
+  document.getElementById('errorRate').textContent = traces.length
+    ? `${Math.round(errors/traces.length*100)}%`
+    : '0%';
+}
+
+function renderTracks(d) {
+  const bp = d.by_protocol || {};
+  ['x402', 'circle-nanopayments', 'stripe-spt'].forEach(proto => {
+    const p = bp[proto] || { count:0, volume_usdc:0, avg_latency_ms:0, errors:0 };
+    const prefix = proto === 'stripe-spt' ? 'spt' : proto === 'circle-nanopayments' ? 'nano' : 'x402';
+    document.getElementById(`${prefix}-count`).textContent = p.count;
+    document.getElementById(`${prefix}-volume`).textContent = fmtUSDC(p.volume_usdc);
+    document.getElementById(`${prefix}-latency`).textContent = p.avg_latency_ms ? fmtLatency(p.avg_latency_ms) : '—';
+    document.getElementById(`${prefix}-errors`).textContent = p.errors;
+  });
+}
+
+function renderTraces(traces) {
+  const tbody = document.getElementById('tracesBody');
+  if (!traces.length) {
+    tbody.innerHTML = '<tr><td colspan="6"><div class="empty-state"><div class="icon">📋</div><div>No traces recorded</div></div></td></tr>';
+    return;
+  }
+  tbody.innerHTML = traces.map(t => {
+    const protoBadge = t.protocol === 'x402' ? 'badge-x402'
+      : t.protocol === 'circle-nanopayments' ? 'badge-nano' : 'badge-spt';
+    const statusBadge = t.errors ? 'badge-err' : t.complete ? 'badge-ok' : 'badge-pend';
+    const statusText = t.errors ? 'Failed' : t.complete ? 'Settled' : 'Pending';
+    return `<tr>
+      <td><code style="font-size:0.8rem;">${t.payment_id}</code></td>
+      <td><span class="badge ${protoBadge}">${t.protocol}</span></td>
+      <td>${t.amount}</td>
+      <td>${t.events}</td>
+      <td>${fmtLatency(t.latency_ms)}</td>
+      <td><span class="badge ${statusBadge}">${statusText}</span></td>
+    </tr>`;
+  }).join('');
+}
+
+function renderPipeline(traces) {
+  const empty = document.getElementById('pipelineEmpty');
+  const flow = document.getElementById('pipeFlow');
+  if (!traces.length) {
+    empty.style.display = 'block';
+    flow.style.display = 'none';
+    return;
+  }
+  empty.style.display = 'none';
+  flow.style.display = 'flex';
+
+  // Show the most recent trace's event pipeline
+  const latest = traces[0];
+  const events = latest.events || [];
+  if (!events.length) {
+    flow.innerHTML = '<div style="color:var(--muted);font-size:0.85rem;">No events in latest trace</div>';
+    return;
+  }
+
+  flow.innerHTML = events.map((ev, i) => {
+    const statusClass = `status-${ev.status}`;
+    return `${i > 0 ? '<span class="pipe-arrow">→</span>' : ''}
+    <div class="pipe-step">
+      <div class="step-name">${ev.event_type}</div>
+      <div class="step-time">${ev.timestamp_ms ? new Date(ev.timestamp_ms).toLocaleTimeString() : ''}</div>
+      <div class="step-status ${statusClass}">${ev.status}</div>
+    </div>`;
+  }).join('');
+}
+
+// ── Demo mode: populate with sample data ──────────────────────
+function loadDemoData() {
+  const demo = {
+    total_payments: 7,
+    total_volume_usdc: 125.010050,
+    by_protocol: {
+      "x402": { count: 3, volume_usdc: 25.03, avg_latency_ms: 2600, errors: 0 },
+      "circle-nanopayments": { count: 3, volume_usdc: 99.980050, avg_latency_ms: 2800, errors: 1 },
+      "stripe-spt": { count: 1, volume_usdc: 0, avg_latency_ms: 0, errors: 0 }
+    },
+    error_traces: [
+      { payment_id: "nano:val:fail:01", protocol: "circle-nanopayments", amount: "$0.0000005", events: 1, latency_ms: 0, complete: false, errors: true }
+    ],
+    pending_traces: [],
+    recent_traces: [
+      { payment_id: "f3a2b1c4d5e6f7a8", protocol: "x402", amount: "$0.01", events: 7, latency_ms: 2550, complete: true, errors: false },
+      { payment_id: "a1b2c3d4e5f6a7b8", protocol: "circle-nanopayments", amount: "$0.000050", events: 7, latency_ms: 2800, complete: true, errors: false },
+      { payment_id: "c4d5e6f7a8b9c0d1", protocol: "x402", amount: "$25.00", events: 5, latency_ms: 2600, complete: true, errors: false },
+      { payment_id: "nano:val:fail:01", protocol: "circle-nanopayments", amount: "$0.0000005", events: 1, latency_ms: 0, complete: false, errors: true },
+      { payment_id: "b2c3d4e5f6a7b8c9", protocol: "circle-nanopayments", amount: "$99.98", events: 7, latency_ms: 2800, complete: true, errors: false },
+      { payment_id: "d5e6f7a8b9c0d1e2", protocol: "x402", amount: "$0.02", events: 7, latency_ms: 2600, complete: false, errors: false },
+      { payment_id: "e6f7a8b9c0d1e2f3", protocol: "stripe-spt", amount: "$15.99", events: 5, latency_ms: 0, complete: true, errors: false },
+    ]
+  };
+  renderAll(demo);
+}
+
+// Auto-load demo on page load
+loadDemoData();
+</script>
+</body>
+</html>
