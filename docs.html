@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>技术文档 · PayGlass</title>
+<style>
+  :root {
+    --bg: #0a0a0f; --surface: #14141f; --border: #252540;
+    --text: #e0e0f0; --muted: #707090;
+    --green: #00e676; --yellow: #ffd740; --red: #ff5252;
+    --blue: #448aff; --purple: #b388ff; --cyan: #18ffff;
+    --radius: 10px; --max-w: 820px;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--bg); color: var(--text); line-height: 1.7;
+  }
+  nav {
+    background: var(--surface); border-bottom: 1px solid var(--border);
+    padding: 0 24px; position: sticky; top: 0; z-index: 10;
+  }
+  nav .inner { max-width: var(--max-w); margin: 0 auto; display: flex; gap: 24px; align-items: center; height: 56px; }
+  nav a { color: var(--muted); text-decoration: none; font-size: 0.9rem; transition: color 0.2s; }
+  nav a:hover, nav a.active { color: var(--text); }
+  nav .brand { font-weight: 700; background: linear-gradient(135deg, var(--cyan), var(--purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 1.1rem; }
+
+  main { max-width: var(--max-w); margin: 0 auto; padding: 48px 24px; }
+  h1 { font-size: 2rem; margin-bottom: 8px; }
+  .subtitle { color: var(--muted); margin-bottom: 40px; }
+  h2 { font-size: 1.3rem; font-weight: 600; margin: 48px 0 20px; padding-top: 24px; border-top: 1px solid var(--border); }
+  h3 { font-size: 1.05rem; font-weight: 600; margin: 24px 0 10px; }
+
+  .doc-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px; margin: 24px 0; }
+  .doc-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 24px;
+    transition: border-color 0.2s; text-decoration: none; color: var(--text); display: block;
+  }
+  .doc-card:hover { border-color: var(--cyan); }
+  .doc-card .icon { font-size: 1.5rem; margin-bottom: 12px; }
+  .doc-card h3 { font-size: 1.05rem; margin-bottom: 8px; color: var(--text); }
+  .doc-card p { color: var(--muted); font-size: 0.9rem; line-height: 1.5; margin: 0; }
+
+  pre { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; overflow-x: auto; margin: 12px 0; font-size: 0.85rem; }
+  code { background: var(--surface); padding: 2px 6px; border-radius: 4px; font-size: 0.85rem; }
+  table { width: 100%; border-collapse: collapse; margin: 16px 0; background: var(--surface); border-radius: var(--radius); overflow: hidden; }
+  th { text-align: left; padding: 10px 14px; background: rgba(255,255,255,0.03); color: var(--muted); font-size: 0.75rem; text-transform: uppercase; }
+  td { padding: 10px 14px; border-top: 1px solid var(--border); font-size: 0.9rem; }
+
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: 600; }
+  .badge-live { background: rgba(0,230,118,0.15); color: var(--green); }
+  .badge-wip { background: rgba(255,215,64,0.15); color: var(--yellow); }
+  .badge-stub { background: rgba(68,138,255,0.15); color: var(--blue); }
+
+  .quickstart-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 24px; margin: 20px 0;
+  }
+  .quickstart-card h3 { color: var(--cyan); margin-bottom: 12px; }
+
+  footer {
+    text-align: center; padding: 48px 24px; border-top: 1px solid var(--border);
+    color: var(--muted); font-size: 0.85rem;
+  }
+  footer a { color: var(--cyan); text-decoration: none; }
+
+  @media (max-width: 600px) { .doc-grid { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="inner">
+    <a href="index.html" class="brand">PayGlass</a>
+    <a href="product.html">产品定义书</a>
+    <a href="docs.html" class="active">技术文档</a>
+    <a href="demo.html">Demo</a>
+    <a href="dashboard/">Dashboard</a>
+  </div>
+</nav>
+
+<main>
+<h1>📖 技术文档</h1>
+<p class="subtitle">从 5 分钟上手到架构深度——PayGlass 开发者的完整指南。</p>
+
+<div class="doc-grid">
+  <a href="#getting-started" class="doc-card">
+    <div class="icon">🚀</div>
+    <h3>快速入门</h3>
+    <p>5 分钟跑通第一个支付追踪。概念、场景、下一步。</p>
+  </a>
+  <a href="#architecture" class="doc-card">
+    <div class="icon">🏗️</div>
+    <h3>架构深度解析</h3>
+    <p>设计哲学、核心组件、数据流、可扩展性。</p>
+  </a>
+  <a href="#x402" class="doc-card">
+    <div class="icon">🔗</div>
+    <h3>x402 协议指南</h3>
+    <p>HTTP 原生支付流程、7 事件详解、调试 FAQ。</p>
+  </a>
+  <a href="#nanopayments" class="doc-card">
+    <div class="icon">💎</div>
+    <h3>Nanopayments 指南</h3>
+    <p>Gas-free USDC 微支付、TEE 验证、批量结算详解。</p>
+  </a>
+  <a href="#circle-skill" class="doc-card">
+    <div class="icon">🤖</div>
+    <h3>Circle Skill 指南</h3>
+    <p>让 AI 编码助手直接调用 PayGlass 追踪能力。</p>
+  </a>
+  <a href="#stripe-spt" class="doc-card">
+    <div class="icon">🛒</div>
+    <h3>Stripe SPT（Stub）</h3>
+    <p>Stripe Agent OS 观测器·API 公开后激活。</p>
+  </a>
+</div>
+
+<!-- Getting Started -->
+<h2 id="getting-started">🚀 快速入门</h2>
+
+<div class="quickstart-card">
+  <h3>5 分钟上手</h3>
+  <pre>git clone https://github.com/jasoneip01-pixel/payglass.git
+cd payglass
+python3 demo.py          # 8 场景全轨 Demo
+python3 -m http.server 8080 -d dashboard/   # 启动 Dashboard</pre>
+</div>
+
+<pre><span class="code-kw">from</span> engine.tracer <span class="code-kw">import</span> PayGlassTracer
+<span class="code-kw">from</span> engine.protocols.nanopayments <span class="code-kw">import</span> NanopaymentsObserver
+
+tracer = PayGlassTracer()
+nano = NanopaymentsObserver(tracer)
+
+<span class="code-cmt"># 追踪一笔 $0.000050 的纳米支付</span>
+trace_id, error = nano.trace_nanopayment(
+    buyer_agent=<span class="code-str">"my-research-agent"</span>,
+    seller_service=<span class="code-str">"https://api.example.com/llm/v1/chat"</span>,
+    amount_usdc=<span class="code-num">0.000050</span>,
+    chain=<span class="code-str">"arbitrum"</span>,
+)
+
+<span class="code-kw">if</span> error:
+    <span class="code-fn">print</span>(<span class="code-str">f"❌ Payment failed: {error}"</span>)
+<span class="code-kw">else</span>:
+    trace = tracer.get_trace(trace_id)
+    <span class="code-fn">print</span>(<span class="code-str">f"✅ Trace: {trace.summary()}"</span>)</pre>
+
+<h3>核心概念：TraceEvent</h3>
+<p>每个支付中的一步。一条完整的支付追踪由 5-7 个 TraceEvent 组成。</p>
+<pre>TraceEvent(
+    trace_id=<span class="code-str">"abc123"</span>,           <span class="code-cmt"># 唯一追踪 ID</span>
+    protocol=Protocol.X402,      <span class="code-cmt"># 协议</span>
+    event_type=<span class="code-str">"signature"</span>,      <span class="code-cmt"># 事件类型</span>
+    status=EventStatus.VERIFIED, <span class="code-cmt"># 当前状态</span>
+    amount_usdc=<span class="code-num">0.01</span>,           <span class="code-cmt"># 金额 (USDC)</span>
+    source_agent=<span class="code-str">"agent-42"</span>,    <span class="code-cmt"># 付款 Agent</span>
+    target_service=<span class="code-str">"https://..."</span>, <span class="code-cmt"># 收款服务</span>
+)</pre>
+
+<h3>事件生命周期</h3>
+<pre>PENDING → VERIFIED → BATCHED → SETTLED
+              ↓
+           FAILED</pre>
+
+<!-- Architecture -->
+<h2 id="architecture">🏗️ 架构深度解析</h2>
+
+<h3>设计哲学</h3>
+<ol>
+  <li><strong>协议无关</strong> — 核心引擎不依赖任何具体协议的实现细节</li>
+  <li><strong>事件归一化</strong> — 所有协议的支付事件映射到统一的 TraceEvent 模型</li>
+  <li><strong>只读观测</strong> — PayGlass 从不修改支付状态，只观测和记录</li>
+</ol>
+
+<h3>三层架构</h3>
+<pre>┌─────────────────────────────────────────────────────┐
+│                   Dashboard Layer                     │
+│  index.html  ←  data.json  ←  tracer.dashboard()    │
+├─────────────────────────────────────────────────────┤
+│                    Engine Layer                       │
+│  PayGlassTracer                                      │
+│  ├── _traces: dict[str, PaymentTrace]                │
+│  ├── ingest(event) → PaymentTrace                    │
+│  ├── get_trace(id) → PaymentTrace                   │
+│  └── dashboard() → dict                              │
+├─────────────────────────────────────────────────────┤
+│                Protocol Adapter Layer                 │
+│  X402Observer  │  NanopaymentsObserver  │  SptObserver│
+│  └─ normalize() → TraceEvent                          │
+└─────────────────────────────────────────────────────┘</pre>
+
+<h3>协议 Observer 对比</h3>
+<table>
+  <thead><tr><th>Observer</th><th>协议</th><th>事件数</th><th>特殊能力</th><th>状态</th></tr></thead>
+  <tbody>
+    <tr><td><code>X402Observer</code></td><td>x402</td><td>7</td><td>HTTP 402 → 批量结算</td><td><span class="badge badge-live">完整</span></td></tr>
+    <tr><td><code>NanopaymentsObserver</code></td><td>Circle Nano</td><td>7</td><td>验证闸门 + TEE</td><td><span class="badge badge-live">完整</span></td></tr>
+    <tr><td><code>StripeSPTObserver</code></td><td>Stripe SPT</td><td>5</td><td>—</td><td><span class="badge badge-stub">Stub</span></td></tr>
+  </tbody>
+</table>
+
+<h3>添加新协议</h3>
+<pre><span class="code-cmt"># 新协议只需实现一个 Observer</span>
+<span class="code-kw">class</span> <span class="code-cls">NewProtocolObserver</span>:
+    <span class="code-kw">def</span> <span class="code-fn">__init__</span>(<span class="code-kw">self</span>, tracer: PayGlassTracer):
+        <span class="code-kw">self</span>.tracer = tracer
+
+    <span class="code-kw">def</span> <span class="code-fn">trace_payment</span>(<span class="code-kw">self</span>, ...) -> str:
+        <span class="code-cmt"># 创建 TraceEvent 序列 → tracer.ingest()</span>
+        <span class="code-kw">return</span> trace_id</pre>
+
+<!-- x402 -->
+<h2 id="x402">🔗 x402 协议集成指南</h2>
+
+<p>x402 是基于 HTTP 402 Payment Required 的 Agent 支付协议。核心创新：<strong>支付嵌入 HTTP 请求本身</strong>，不需要账户、会话或钱包弹窗。</p>
+
+<h3>标准流程</h3>
+<pre>Client Agent              Server (Resource)           Circle Gateway
+     │                          │                          │
+     │──GET /api/v1/chat───────>│                          │
+     │<──402 Payment Required───│                          │
+     │   X-Payment: x402        │                          │
+     │                          │                          │
+     │──EIP-3009 sign───────────│                          │
+     │                          │                          │
+     │──GET + Payment header───>│                          │
+     │                          │──verify(sig)────────────>│
+     │                          │<──✅ verified────────────│
+     │<──200 OK + data──────────│                          │
+     │                          │──batch_settle───────────>│</pre>
+
+<h3>7 个事件详解</h3>
+<table>
+  <thead><tr><th>#</th><th>事件类型</th><th>状态</th><th>说明</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td><code>402_response</code></td><td>PENDING</td><td>服务端返回 402，要求支付</td></tr>
+    <tr><td>2</td><td><code>signature</code></td><td>PENDING</td><td>Agent 生成 EIP-3009 授权签名</td></tr>
+    <tr><td>3</td><td><code>payment_header</code></td><td>PENDING</td><td>Agent 重试请求，带上 Payment 头</td></tr>
+    <tr><td>4</td><td><code>verification</code></td><td>VERIFIED</td><td>Gateway 验证签名通过</td></tr>
+    <tr><td>5</td><td><code>resource_delivered</code></td><td>VERIFIED</td><td>服务端返回资源</td></tr>
+    <tr><td>6</td><td><code>batch</code></td><td>BATCHED</td><td>支付被纳入批量结算批次</td></tr>
+    <tr><td>7</td><td><code>settlement</code></td><td>SETTLED</td><td>链上结算完成</td></tr>
+  </tbody>
+</table>
+
+<h3>调试：签名验证失败</h3>
+<pre><span class="code-kw">for</span> e <span class="code-kw">in</span> trace.events:
+    <span class="code-kw">if</span> e.event_type == <span class="code-str">"verification"</span> <span class="code-kw">and</span> e.status == EventStatus.FAILED:
+        <span class="code-fn">print</span>(<span class="code-str">f"Signature failed: {e.error}"</span>)
+        <span class="code-fn">print</span>(<span class="code-str">f"Metadata: {e.metadata}"</span>)</pre>
+
+<!-- Nanopayments -->
+<h2 id="nanopayments">💎 Circle Nanopayments 指南</h2>
+
+<p>Gas-free USDC 微支付基础设施。<strong>$0.000001 起，零 Gas 费</strong>，专为 AI Agent 间高频微小支付设计。</p>
+
+<h3>为什么 Nanopayments 是关键基建</h3>
+<table>
+  <thead><tr><th>支付方式</th><th>最小金额</th><th>手续费</th><th>Agent 友好？</th></tr></thead>
+  <tbody>
+    <tr><td>信用卡</td><td>~$1.00</td><td>2.9% + $0.30</td><td>❌ 需要人工 checkout</td></tr>
+    <tr><td>链上 USDC</td><td>任意</td><td>$0.01-$0.50 gas</td><td>❌ 每笔都要 gas</td></tr>
+    <tr><td><strong>Nanopayments</strong></td><td><strong>$0.000001</strong></td><td><strong>$0</strong></td><td><strong>✅ EIP-3009 离线签名</strong></td></tr>
+  </tbody>
+</table>
+
+<h3>三层设计</h3>
+<pre>Agent (Buyer)     → EIP-3009 签名
+Circle Gateway    → AWS Nitro Enclave 验证 → 链下扣减
+Blockchain        → 数千笔合并为一笔 tx → Gas $0.02/批次</pre>
+
+<h3>验证闸门</h3>
+<pre><span class="code-cmt"># ❌ 低于 $0.000001 → 立即 FAILED</span>
+trace_id, error = nano.trace_nanopayment(
+    buyer_agent=<span class="code-str">"test-agent"</span>,
+    seller_service=<span class="code-str">"https://test.example.com"</span>,
+    amount_usdc=<span class="code-num">0.0000005</span>,  <span class="code-cmt"># 5e-7 < 1e-6</span>
+)
+<span class="code-cmt"># error = "Amount $5e-07 below minimum $1e-06"</span></pre>
+
+<h3>与 x402 的关系</h3>
+<p>Nanopayments 和 x402 <strong>不是竞争关系——是互补的</strong>：x402 是应用层协议（"怎么请求支付"），Nanopayments 是结算层（"怎么结算支付"）。Circle 的协议无关策略意味着两者通过同一个 Gateway 统一结算。</p>
+
+<!-- Circle Skill -->
+<h2 id="circle-skill">🤖 Circle Skill 使用指南</h2>
+
+<p>PayGlass 作为 Circle Skill，让 AI 编码助手（OpenClaw/Cursor/Codex/Claude Code）能够直接调用支付追踪能力。</p>
+
+<h3>安装</h3>
+<pre><span class="code-cmt"># OpenClaw</span>
+cp skill/SKILL.md ~/workspace/agent/skills/payglass/
+
+<span class="code-cmt"># Cursor</span>
+cp skill/SKILL.md .cursor/rules/payglass.md
+
+<span class="code-cmt"># Claude Code</span>
+cp skill/SKILL.md .claude/skills/payglass.md</pre>
+
+<h3>能力矩阵</h3>
+<table>
+  <thead><tr><th>能力</th><th>触发方式</th></tr></thead>
+  <tbody>
+    <tr><td>追踪单笔支付</td><td>"trace this payment" / "debug payment failure"</td></tr>
+    <tr><td>查看 Dashboard</td><td>"show payment dashboard" / "payment stats"</td></tr>
+    <tr><td>跨协议对比</td><td>"compare x402 vs nanopayments"</td></tr>
+    <tr><td>批量结算检查</td><td>"check batch settlement" / "pending settlements"</td></tr>
+    <tr><td>错误诊断</td><td>"why did this payment fail" / "payment error"</td></tr>
+  </tbody>
+</table>
+
+<!-- Stripe SPT -->
+<h2 id="stripe-spt">🛒 Stripe SPT Observer（Stub）</h2>
+<p>Stripe SPT 仍在 Private Preview，API 未公开。<strong>Observer 结构已就位</strong>，API 公开后可立即接入。</p>
+<p>SPT 观测器当前提供 5 个占位事件：<code>session_init → token_create → authorization → payment_complete → settlement</code>，覆盖 Stripe Agent OS 的标准支付流。</p>
+
+</main>
+
+<footer>
+  <p>PayGlass v0.1.0 · <a href="https://github.com/jasoneip01-pixel/payglass">GitHub</a> · <a href="product.html">产品定义书</a> · <a href="demo.html">Demo</a></p>
+</footer>
+</body>
+</html>
