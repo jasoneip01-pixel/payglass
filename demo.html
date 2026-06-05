@@ -10,12 +10,12 @@
     --text: #e0e0f0; --muted: #707090;
     --green: #00e676; --yellow: #ffd740; --red: #ff5252;
     --blue: #448aff; --purple: #b388ff; --cyan: #18ffff;
-    --radius: 10px; --max-w: 820px;
+    --radius: 10px; --max-w: 900px;
   }
   * { margin:0; padding:0; box-sizing:border-box; }
   body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    background: var(--bg); color: var(--text); line-height: 1.7;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, monospace;
+    background: var(--bg); color: var(--text); line-height: 1.6;
   }
   nav {
     background: var(--surface); border-bottom: 1px solid var(--border);
@@ -26,81 +26,76 @@
   nav a:hover, nav a.active { color: var(--text); }
   nav .brand { font-weight: 700; background: linear-gradient(135deg, var(--cyan), var(--purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 1.1rem; }
 
-  main { max-width: var(--max-w); margin: 0 auto; padding: 48px 24px; }
-  h1 { font-size: 2rem; margin-bottom: 8px; }
-  .subtitle { color: var(--muted); margin-bottom: 40px; }
-  h2 { font-size: 1.3rem; font-weight: 600; margin: 40px 0 20px; padding-top: 24px; border-top: 1px solid var(--border); }
-  h3 { font-size: 1.05rem; font-weight: 600; margin: 20px 0 10px; }
+  main { max-width: var(--max-w); margin: 0 auto; padding: 40px 24px; }
 
-  .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin: 24px 0; }
-  .summary-card {
+  /* Controls */
+  .controls { display: flex; gap: 10px; flex-wrap: wrap; margin: 20px 0; align-items: center; }
+  .btn {
+    padding: 8px 18px; border-radius: 6px; font-size: 0.85rem; font-weight: 600;
+    cursor: pointer; border: 1px solid var(--border); background: var(--surface);
+    color: var(--text); transition: all 0.15s;
+  }
+  .btn:hover { border-color: var(--cyan); color: var(--cyan); }
+  .btn-run { background: linear-gradient(135deg, var(--cyan), var(--purple)); color: #fff; border: none; }
+  .btn-run:hover { opacity: 0.9; color: #fff; }
+  .btn-reset { border-color: var(--red); color: var(--red); }
+  .btn-reset:hover { background: rgba(255,82,82,0.1); }
+
+  /* Stats */
+  .stats-bar { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 16px 0; }
+  .stat-mini { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px; text-align: center; }
+  .stat-mini .val { font-size: 1.4rem; font-weight: 700; }
+  .stat-mini .lbl { font-size: 0.7rem; color: var(--muted); text-transform: uppercase; }
+  @media (max-width: 500px) { .stats-bar { grid-template-columns: 1fr 1fr; } }
+
+  /* Pipeline */
+  .pipeline-box { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; margin: 20px 0; }
+  .pipeline-box h3 { font-size: 0.9rem; color: var(--muted); margin-bottom: 14px; text-transform: uppercase; letter-spacing: 0.05em; }
+  .pipe-row { display: flex; align-items: center; gap: 6px; overflow-x: auto; padding: 4px 0; }
+  .pipe-step {
+    background: var(--bg); border: 1px solid var(--border); border-radius: 6px;
+    padding: 10px 12px; text-align: center; min-width: 90px; flex-shrink: 0; transition: all 0.3s;
+  }
+  .pipe-step.active { border-color: var(--cyan); box-shadow: 0 0 12px rgba(24,255,255,0.2); }
+  .pipe-step.done { border-color: var(--green); }
+  .pipe-step.fail { border-color: var(--red); background: rgba(255,82,82,0.08); }
+  .pipe-step .sn { font-size: 0.65rem; color: var(--muted); }
+  .pipe-step .se { font-size: 0.75rem; font-weight: 600; }
+  .pipe-step .ss { font-size: 0.65rem; margin-top: 2px; }
+  .pipe-arr { color: var(--muted); font-size: 0.9rem; flex-shrink: 0; }
+
+  /* Scenarios */
+  .scenario-list { display: grid; gap: 8px; margin: 16px 0; }
+  .scen-row {
+    display: grid; grid-template-columns: 1fr auto auto auto;
+    align-items: center; gap: 12px;
     background: var(--surface); border: 1px solid var(--border);
-    border-radius: var(--radius); padding: 20px; text-align: center;
+    border-radius: 6px; padding: 12px 16px; transition: border-color 0.2s;
+    cursor: pointer; font-size: 0.85rem;
   }
-  .summary-card .num { font-size: 2rem; font-weight: 700; }
-  .summary-card .lbl { font-size: 0.8rem; color: var(--muted); margin-top: 4px; }
-  .num.cyan { color: var(--cyan); }
-  .num.green { color: var(--green); }
-  .num.red { color: var(--red); }
-  .num.purple { color: var(--purple); }
+  .scen-row:hover { border-color: var(--cyan); }
+  .scen-row.running { border-color: var(--cyan); box-shadow: 0 0 8px rgba(24,255,255,0.15); }
+  .scen-row.done { border-color: var(--green); }
+  .scen-row.failed { border-color: var(--red); }
+  .scen-name { font-weight: 600; }
+  .scen-agent { color: var(--muted); font-size: 0.78rem; }
+  .scen-amount { font-weight: 600; font-size: 0.85rem; }
+  .scen-status { font-size: 0.75rem; width: 60px; text-align: right; }
 
-  .track-section { margin: 32px 0; }
-  .track-label {
-    display: inline-block; padding: 4px 12px; border-radius: 4px;
-    font-size: 0.8rem; font-weight: 600; margin-bottom: 16px;
-  }
-  .track-x402 { background: rgba(24,255,255,0.15); color: var(--cyan); }
-  .track-nano { background: rgba(179,136,255,0.15); color: var(--purple); }
-  .track-spt { background: rgba(68,138,255,0.15); color: var(--blue); }
-
-  .scenario {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: var(--radius); padding: 20px; margin: 12px 0;
-  }
-  .scenario-header {
-    display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;
-  }
-  .scenario-name { font-weight: 600; font-size: 1rem; }
-  .scenario-amount { font-size: 0.9rem; color: var(--muted); }
-  .scenario-detail { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 0.85rem; }
-  .detail-k { color: var(--muted); }
-  .detail-v { color: var(--text); }
-
-  .pipeline-mini {
-    display: flex; align-items: center; gap: 4px; margin-top: 12px; flex-wrap: wrap;
-  }
-  .pmin-step {
-    background: var(--bg); border: 1px solid var(--border);
-    border-radius: 4px; padding: 4px 8px; font-size: 0.72rem;
-    white-space: nowrap;
-  }
-  .pmin-arrow { color: var(--muted); font-size: 0.8rem; }
-
-  .error-card {
-    background: rgba(255,82,82,0.08); border: 1px solid rgba(255,82,82,0.3);
-    border-radius: var(--radius); padding: 20px; margin: 12px 0;
-  }
-  .error-card .err-label { color: var(--red); font-weight: 600; margin-bottom: 8px; }
-
-  pre { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; overflow-x: auto; margin: 12px 0; font-size: 0.85rem; }
-  code { background: var(--surface); padding: 2px 6px; border-radius: 4px; font-size: 0.85rem; }
-
-  .run-btn {
-    display: inline-block; padding: 10px 24px; background: linear-gradient(135deg, var(--cyan), var(--purple));
-    color: #fff; border-radius: 8px; font-weight: 600; text-decoration: none; border: none; cursor: pointer; font-size: 0.95rem;
-  }
-  .run-btn:hover { opacity: 0.9; }
+  /* Log */
+  .log-box { background: #000; border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; margin: 20px 0; max-height: 300px; overflow-y: auto; font-size: 0.8rem; }
+  .log-line { padding: 2px 0; font-family: 'Menlo', 'Consolas', monospace; }
+  .log-ts { color: var(--muted); margin-right: 8px; }
+  .log-ok { color: var(--green); }
+  .log-warn { color: var(--yellow); }
+  .log-err { color: var(--red); }
+  .log-info { color: var(--cyan); }
 
   footer {
-    text-align: center; padding: 48px 24px; border-top: 1px solid var(--border);
+    text-align: center; padding: 40px 24px; border-top: 1px solid var(--border);
     color: var(--muted); font-size: 0.85rem;
   }
   footer a { color: var(--cyan); text-decoration: none; }
-
-  @media (max-width: 600px) {
-    .scenario-detail { grid-template-columns: 1fr; }
-    .summary-grid { grid-template-columns: 1fr 1fr; }
-  }
 </style>
 </head>
 <body>
@@ -116,213 +111,206 @@
 </nav>
 
 <main>
-<h1>🧪 Demo</h1>
-<p class="subtitle">8 个支付场景，覆盖全部 3 条轨道。一键运行，即刻观测。</p>
+<h1>🧪 Live Demo</h1>
+<p style="color:var(--muted);margin-bottom:4px;">点击场景卡片运行支付追踪。管线实时动画，日志同步输出。</p>
 
-<!-- Summary -->
-<div class="summary-grid">
-  <div class="summary-card"><div class="num cyan">8</div><div class="lbl">支付场景</div></div>
-  <div class="summary-card"><div class="num green">3</div><div class="lbl">协议轨道</div></div>
-  <div class="summary-card"><div class="num purple">$141.00</div><div class="lbl">总交易量</div></div>
-  <div class="summary-card"><div class="num red">1</div><div class="lbl">验证捕获</div></div>
+<div class="controls">
+  <button class="btn btn-run" onclick="runAll()">▶ 运行全部 (8 scenarios)</button>
+  <button class="btn btn-reset" onclick="resetAll()">↺ 重置</button>
+  <span style="font-size:0.8rem;color:var(--muted);margin-left:8px;">或点击下方单条场景</span>
 </div>
 
-<a href="https://github.com/jasoneip01-pixel/payglass" class="run-btn">▶ 运行 Demo：python3 demo.py</a>
+<div class="stats-bar">
+  <div class="stat-mini"><div class="val" id="st-count" style="color:var(--cyan);">0</div><div class="lbl">Payments</div></div>
+  <div class="stat-mini"><div class="val" id="st-volume" style="color:var(--purple);">$0</div><div class="lbl">Volume</div></div>
+  <div class="stat-mini"><div class="val" id="st-ok" style="color:var(--green);">0</div><div class="lbl">Settled</div></div>
+  <div class="stat-mini"><div class="val" id="st-err" style="color:var(--red);">0</div><div class="lbl">Errors</div></div>
+</div>
 
-<!-- Track 1: x402 -->
-<div class="track-section">
-  <span class="track-label track-x402">Track 1 · x402 Protocol · 3 scenarios</span>
-
-  <div class="scenario">
-    <div class="scenario-header">
-      <div class="scenario-name">🅰️ Pay-per-Call LLM API</div>
-      <div class="scenario-amount">$0.01</div>
-    </div>
-    <div class="scenario-detail">
-      <div class="detail-k">Resource</div><div class="detail-v">https://api.openai.com/v1/chat/completions</div>
-      <div class="detail-k">Agent</div><div class="detail-v">research-agent-42</div>
-      <div class="detail-k">Chain</div><div class="detail-v">arbitrum</div>
-      <div class="detail-k">Events</div><div class="detail-v">7 (signature → verification → batch → settled)</div>
-    </div>
-    <div class="pipeline-mini">
-      <div class="pmin-step">402</div><div class="pmin-arrow">→</div>
-      <div class="pmin-step">签名</div><div class="pmin-arrow">→</div>
-      <div class="pmin-step">验证</div><div class="pmin-arrow">→</div>
-      <div class="pmin-step">交付</div><div class="pmin-arrow">→</div>
-      <div class="pmin-step">批量</div><div class="pmin-arrow">→</div>
-      <div class="pmin-step">✅ 结算</div>
-    </div>
-  </div>
-
-  <div class="scenario">
-    <div class="scenario-header">
-      <div class="scenario-name">🅱️ Data Oracle Query</div>
-      <div class="scenario-amount">$0.02</div>
-    </div>
-    <div class="scenario-detail">
-      <div class="detail-k">Resource</div><div class="detail-v">https://oracle.chainlink.com/eth-usd</div>
-      <div class="detail-k">Agent</div><div class="detail-v">trading-agent-7</div>
-      <div class="detail-k">Chain</div><div class="detail-v">arbitrum</div>
-    </div>
-  </div>
-
-  <div class="scenario">
-    <div class="scenario-header">
-      <div class="scenario-name">🅲 Batch Model Inference</div>
-      <div class="scenario-amount">$25.00</div>
-    </div>
-    <div class="scenario-detail">
-      <div class="detail-k">Resource</div><div class="detail-v">https://inference.example.com/batch/v1</div>
-      <div class="detail-k">Agent</div><div class="detail-v">analytics-agent-3</div>
-      <div class="detail-k">Chain</div><div class="detail-v">optimism</div>
-    </div>
+<div class="pipeline-box">
+  <h3>📡 Live Payment Pipeline <span id="pipe-label" style="font-weight:400;font-size:0.75rem;color:var(--muted);"></span></h3>
+  <div class="pipe-row" id="pipe-row">
+    <div class="pipe-step" id="ps0"><div class="sn">1</div><div class="se">402</div><div class="ss">—</div></div>
+    <span class="pipe-arr">→</span>
+    <div class="pipe-step" id="ps1"><div class="sn">2</div><div class="se">Sign</div><div class="ss">—</div></div>
+    <span class="pipe-arr">→</span>
+    <div class="pipe-step" id="ps2"><div class="sn">3</div><div class="se">Verify</div><div class="ss">—</div></div>
+    <span class="pipe-arr">→</span>
+    <div class="pipe-step" id="ps3"><div class="sn">4</div><div class="se">Deliver</div><div class="ss">—</div></div>
+    <span class="pipe-arr">→</span>
+    <div class="pipe-step" id="ps4"><div class="sn">5</div><div class="se">Batch</div><div class="ss">—</div></div>
+    <span class="pipe-arr">→</span>
+    <div class="pipe-step" id="ps5"><div class="sn">6</div><div class="se">Settle</div><div class="ss">—</div></div>
   </div>
 </div>
 
-<!-- Track 2: Nanopayments -->
-<div class="track-section">
-  <span class="track-label track-nano">Track 2 · Circle Nanopayments · 4 scenarios</span>
+<div class="scenario-list" id="scenarios"></div>
 
-  <div class="scenario">
-    <div class="scenario-header">
-      <div class="scenario-name">🅳 Sub-Cent Price Feed</div>
-      <div class="scenario-amount">$0.000050</div>
-    </div>
-    <div class="scenario-detail">
-      <div class="detail-k">Buyer</div><div class="detail-v">data-agent-7</div>
-      <div class="detail-k">Seller</div><div class="detail-v">https://feeds.circle.com/btc-usd</div>
-      <div class="detail-k">Chain</div><div class="detail-v">arbitrum</div>
-      <div class="detail-k">Highlight</div><div class="detail-v">5 hundred-thousandths — only possible with Nanopayments</div>
-    </div>
-    <div class="pipeline-mini">
-      <div class="pmin-step">存款</div><div class="pmin-arrow">→</div>
-      <div class="pmin-step">EIP-3009</div><div class="pmin-arrow">→</div>
-      <div class="pmin-step">TEE 验证</div><div class="pmin-arrow">→</div>
-      <div class="pmin-step">扣减</div><div class="pmin-arrow">→</div>
-      <div class="pmin-step">批量</div><div class="pmin-arrow">→</div>
-      <div class="pmin-step">✅ 结算</div>
-    </div>
-  </div>
-
-  <div class="scenario">
-    <div class="scenario-header">
-      <div class="scenario-name">🅴 API Metering at Scale</div>
-      <div class="scenario-amount">$0.001</div>
-    </div>
-    <div class="scenario-detail">
-      <div class="detail-k">Buyer</div><div class="detail-v">monitor-agent-1</div>
-      <div class="detail-k">Seller</div><div class="detail-v">https://metrics.example.com/api/v2/query</div>
-    </div>
-  </div>
-
-  <div class="error-card">
-    <div class="err-label">⚠️ 验证失败捕获</div>
-    <div class="scenario">
-      <div class="scenario-header">
-        <div class="scenario-name">🅵 Below Minimum — Validation Gate</div>
-        <div class="scenario-amount">$0.0000005</div>
-      </div>
-      <div class="scenario-detail">
-        <div class="detail-k">Buyer</div><div class="detail-v">test-agent-0</div>
-        <div class="detail-k">Seller</div><div class="detail-v">https://test.example.com/ping</div>
-        <div class="detail-k">Result</div><div class="detail-v" style="color:var(--red);">❌ Amount $5e-07 below minimum $1e-06</div>
-        <div class="detail-k">Events</div><div class="detail-v">1 (validation_failed → stopped)</div>
-      </div>
-    </div>
-    <p style="font-size:0.85rem;color:var(--muted);margin-top:8px;">
-      这是<strong>正确的失败</strong>——PayGlass 的验证闸门在第一步就拦截了非法支付，不浪费后续计算资源。
-    </p>
-  </div>
-
-  <div class="scenario">
-    <div class="scenario-header">
-      <div class="scenario-name">🅶 Wallet Top-Up (Large Nanopayment)</div>
-      <div class="scenario-amount">$99.98</div>
-    </div>
-    <div class="scenario-detail">
-      <div class="detail-k">Buyer</div><div class="detail-v">treasury-agent-0</div>
-      <div class="detail-k">Seller</div><div class="detail-v">https://gateway.circle.com/deposit</div>
-      <div class="detail-k">Note</div><div class="detail-v">Nanopayments handles any amount — micro and macro</div>
-    </div>
-  </div>
-</div>
-
-<!-- Track 3: Stripe SPT -->
-<div class="track-section">
-  <span class="track-label track-spt">Track 3 · Stripe SPT (Stub) · 1 scenario</span>
-
-  <div class="scenario">
-    <div class="scenario-header">
-      <div class="scenario-name">🅷 E-Commerce Checkout</div>
-      <div class="scenario-amount">$15.99</div>
-    </div>
-    <div class="scenario-detail">
-      <div class="detail-k">Resource</div><div class="detail-v">https://shop.example.com/api/checkout</div>
-      <div class="detail-k">Agent</div><div class="detail-v">shopping-agent-3</div>
-      <div class="detail-k">Payment</div><div class="detail-v">Link Agent Wallet</div>
-      <div class="detail-k">Status</div><div class="detail-v"><span style="color:var(--yellow);">🟡 Stub — awaiting Stripe SPT public beta</span></div>
-    </div>
-    <div class="pipeline-mini">
-      <div class="pmin-step">Session</div><div class="pmin-arrow">→</div>
-      <div class="pmin-step">Token</div><div class="pmin-arrow">→</div>
-      <div class="pmin-step">Auth</div><div class="pmin-arrow">→</div>
-      <div class="pmin-step">Payment</div><div class="pmin-arrow">→</div>
-      <div class="pmin-step">✅ Settled</div>
-    </div>
-  </div>
-</div>
-
-<!-- Batch Summary -->
-<h2>📦 批量结算汇总</h2>
-<div class="scenario">
-  <div class="scenario-header">
-    <div class="scenario-name">x402 Batch #001</div>
-    <div class="scenario-amount">2 payments · arbitrum</div>
-  </div>
-  <div class="scenario-detail">
-    <div class="detail-k">Payments</div><div class="detail-v">LLM API ($0.01) + Oracle ($0.02)</div>
-    <div class="detail-k">Tx Hash</div><div class="detail-v"><code>0xabc123...settle1</code></div>
-  </div>
-</div>
-<div class="scenario">
-  <div class="scenario-header">
-    <div class="scenario-name">x402 Batch #002</div>
-    <div class="scenario-amount">1 payment · optimism</div>
-  </div>
-  <div class="scenario-detail">
-    <div class="detail-k">Payment</div><div class="detail-v">Batch Inference ($25.00)</div>
-    <div class="detail-k">Tx Hash</div><div class="detail-v"><code>0xdef456...settle2</code></div>
-  </div>
-</div>
-<div class="scenario">
-  <div class="scenario-header">
-    <div class="scenario-name">Nanopayments Batch #001</div>
-    <div class="scenario-amount">3 payments · $0.02 gas total</div>
-  </div>
-  <div class="scenario-detail">
-    <div class="detail-k">Payments</div><div class="detail-v">$0.000050 + $0.001 + $99.98</div>
-    <div class="detail-k">Gas Cost</div><div class="detail-v" style="color:var(--green);">$0.02 total (≈$0.007 per payment)</div>
-  </div>
-</div>
-
-<h2>🚀 运行 Demo</h2>
-<pre>git clone https://github.com/jasoneip01-pixel/payglass.git
-cd payglass
-<span class="code-cmt"># 8 scenarios, 3 tracks, 1 validation catch</span>
-python3 demo.py
-
-<span class="code-cmt"># View the live dashboard</span>
-python3 -m http.server 8080 -d dashboard/
-<span class="code-cmt"># → http://localhost:8080</span></pre>
-
-<p style="color:var(--muted);margin-top:16px;">
-  运行后 demo.py 会自动生成 <code>dashboard/data.json</code>，Dashboard 页面会自动加载最新数据。
-</p>
+<div class="log-box" id="log"><div class="log-line"><span class="log-ts">ready</span><span class="log-info">PayGlass Demo Engine v0.1.0 — click a scenario to trace a payment</span></div></div>
 
 </main>
 
 <footer>
   <p>PayGlass v0.1.0 · <a href="https://github.com/jasoneip01-pixel/payglass">GitHub</a> · <a href="product.html">产品定义书</a> · <a href="docs.html">技术文档</a></p>
 </footer>
+
+<script>
+// ── PayGlass Demo Engine (Browser Runtime) ──────────────────────
+
+const SCENARIOS = [
+  { id:'A', track:'x402', name:'Pay-per-Call LLM API', agent:'research-agent-42', target:'api.openai.com/v1/chat', amount:0.01, chain:'arbitrum', steps:['402_response','signature','payment_header','verification','resource_delivered','batch','settlement'] },
+  { id:'B', track:'x402', name:'Data Oracle Query', agent:'trading-agent-7', target:'oracle.chainlink.com/eth-usd', amount:0.02, chain:'arbitrum', steps:['402_response','signature','payment_header','verification','resource_delivered','batch','settlement'] },
+  { id:'C', track:'x402', name:'Batch Model Inference', agent:'analytics-agent-3', target:'inference.example.com/batch', amount:25.00, chain:'optimism', steps:['402_response','signature','payment_header','verification','resource_delivered','batch','settlement'] },
+  { id:'D', track:'nano', name:'Sub-Cent Price Feed', agent:'data-agent-7', target:'feeds.circle.com/btc-usd', amount:0.000050, chain:'arbitrum', steps:['deposit_check','authorization','tee_verification','balance_deduction','resource_delivered','batch','settlement'] },
+  { id:'E', track:'nano', name:'API Metering at Scale', agent:'monitor-agent-1', target:'metrics.example.com/api/v2', amount:0.001, chain:'arbitrum', steps:['deposit_check','authorization','tee_verification','balance_deduction','resource_delivered','batch','settlement'] },
+  { id:'F', track:'nano', name:'⚠️ Below Minimum — VALIDATION GATE', agent:'test-agent-0', target:'test.example.com/ping', amount:0.0000005, chain:'arbitrum', steps:['validation'], fail:true, failMsg:'Amount $5e-07 below minimum $1e-06' },
+  { id:'G', track:'nano', name:'Wallet Top-Up (Large Nano)', agent:'treasury-agent-0', target:'gateway.circle.com/deposit', amount:99.98, chain:'arbitrum', steps:['deposit_check','authorization','tee_verification','balance_deduction','resource_delivered','batch','settlement'] },
+  { id:'H', track:'spt', name:'E-Commerce Checkout', agent:'shopping-agent-3', target:'shop.example.com/checkout', amount:15.99, chain:'—', steps:['session_init','token_create','authorization','payment_complete','settlement'], stub:true },
+];
+
+const STEP_LABELS = {
+  '402_response':'402','signature':'Sign','payment_header':'PayHdr','verification':'Verify','resource_delivered':'Deliver','batch':'Batch','settlement':'Settle',
+  'deposit_check':'Deposit','authorization':'Auth','tee_verification':'TEE','balance_deduction':'Deduct',
+  'session_init':'Session','token_create':'Token','payment_complete':'Complete',
+  'validation':'Validate'
+};
+
+let stats = { count:0, volume:0, ok:0, err:0 };
+let running = false;
+
+function log(level, msg) {
+  const el = document.getElementById('log');
+  const cls = level === 'ok' ? 'log-ok' : level === 'err' ? 'log-err' : level === 'warn' ? 'log-warn' : 'log-info';
+  const ts = new Date().toLocaleTimeString();
+  el.innerHTML += `<div class="log-line"><span class="log-ts">${ts}</span><span class="${cls}">${msg}</span></div>`;
+  el.scrollTop = el.scrollHeight;
+}
+
+function updateStats() {
+  document.getElementById('st-count').textContent = stats.count;
+  document.getElementById('st-volume').textContent = '$' + stats.volume.toFixed(stats.volume < 0.01 ? 6 : 2);
+  document.getElementById('st-ok').textContent = stats.ok;
+  document.getElementById('st-err').textContent = stats.err;
+}
+
+function resetPipeline() {
+  for (let i=0; i<6; i++) {
+    const el = document.getElementById('ps'+i);
+    if (el) { el.className = 'pipe-step'; el.querySelector('.ss').textContent = '—'; }
+  }
+  document.getElementById('pipe-label').textContent = '';
+}
+
+function highlightStep(idx, status) {
+  const el = document.getElementById('ps'+idx);
+  if (!el) return;
+  el.className = 'pipe-step ' + status;
+  el.querySelector('.ss').textContent = status === 'active' ? '...' : status === 'done' ? '✓' : '✗';
+}
+
+async function runScenario(scen, idx) {
+  const row = document.querySelectorAll('.scen-row')[idx];
+  row.classList.add('running');
+  row.querySelector('.scen-status').textContent = 'running...';
+
+  const trackEmoji = scen.track === 'x402' ? '🔗' : scen.track === 'nano' ? '💎' : '🛒';
+  const stubNote = scen.stub ? ' [STUB]' : '';
+  log('info', `${trackEmoji} Scenario ${scen.id}: ${scen.name} — $${scen.amount < 0.01 ? scen.amount.toFixed(6) : scen.amount.toFixed(2)}${stubNote}`);
+  document.getElementById('pipe-label').textContent = `${scen.agent} → ${scen.target}`;
+
+  resetPipeline();
+  const maxSteps = Math.min(scen.steps.length, 6);
+  const startIdx = Math.max(0, 6 - maxSteps);
+
+  for (let i = 0; i < maxSteps; i++) {
+    const pidx = startIdx + i;
+    const el = document.getElementById('ps'+pidx);
+    if (el) {
+      el.querySelector('.se').textContent = STEP_LABELS[scen.steps[i]] || scen.steps[i];
+      el.querySelector('.sn').textContent = pidx + 1;
+    }
+  }
+  // Clear unused steps
+  for (let i = 0; i < startIdx; i++) {
+    const el = document.getElementById('ps'+i);
+    if (el) { el.querySelector('.se').textContent = '—'; el.querySelector('.ss').textContent = '—'; }
+  }
+
+  for (let i = 0; i < maxSteps; i++) {
+    const pidx = startIdx + i;
+    highlightStep(pidx, 'active');
+    const stepName = scen.steps[i];
+    log('info', `  └─ ${stepName}...`);
+
+    await sleep(scen.fail ? 150 : 300 + Math.random() * 200);
+
+    if (scen.fail && i === 0) {
+      highlightStep(pidx, 'fail');
+      log('err', `  ❌ ${scen.failMsg}`);
+      row.classList.remove('running');
+      row.classList.add('failed');
+      row.querySelector('.scen-status').innerHTML = '<span style="color:var(--red);">❌ blocked</span>';
+      stats.count++; stats.err++;
+      updateStats();
+      return;
+    }
+
+    highlightStep(pidx, 'done');
+    if (i < maxSteps - 1) {
+      log('ok', `  ✅ ${stepName} (${Math.round(50 + Math.random()*300)}ms)`);
+    }
+  }
+
+  await sleep(400);
+  stats.count++; stats.ok++; stats.volume += scen.amount;
+  updateStats();
+
+  row.classList.remove('running');
+  row.classList.add('done');
+  const totalMs = Math.round(800 + Math.random() * 2000);
+  const latency = scen.stub ? '~2s (est.)' : totalMs + 'ms';
+  row.querySelector('.scen-status').innerHTML = `<span style="color:var(--green);">✓ ${latency}</span>`;
+  log('ok', `🏁 Settled — trace ${scen.id.toLowerCase()}${Math.random().toString(36).slice(2,6)} · ${scen.chain}`);
+}
+
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+async function runAll() {
+  if (running) return;
+  running = true;
+  resetAll();
+  for (let i = 0; i < SCENARIOS.length; i++) {
+    await runScenario(SCENARIOS[i], i);
+    await sleep(500);
+  }
+  log('info', '═══════════════════════════════════════');
+  log('ok', `🎯 All 8 scenarios complete: ${stats.ok} settled, ${stats.err} blocked`);
+  log('info', `   Volume: $${stats.volume.toFixed(2)} · Protocols: x402(3) + Nano(4) + SPT(1)`);
+  running = false;
+}
+
+function resetAll() {
+  stats = { count:0, volume:0, ok:0, err:0 };
+  updateStats();
+  resetPipeline();
+  document.getElementById('log').innerHTML = '<div class="log-line"><span class="log-ts">ready</span><span class="log-info">PayGlass Demo Engine v0.1.0 — click a scenario to trace a payment</span></div>';
+  document.querySelectorAll('.scen-row').forEach(r => { r.classList.remove('running','done','failed'); r.querySelector('.scen-status').textContent = '—'; });
+}
+
+// ── Render ──────────────────────────────────────────────────────
+function render() {
+  const el = document.getElementById('scenarios');
+  el.innerHTML = SCENARIOS.map((s, i) => {
+    const badge = s.track === 'x402' ? '🔗 x402' : s.track === 'nano' ? '💎 Nano' : '🛒 SPT';
+    const amt = s.amount < 0.01 ? '$' + s.amount.toFixed(6) : '$' + s.amount.toFixed(2);
+    return `<div class="scen-row" onclick="if(!running)runScenario(SCENARIOS[${i}],${i})">
+      <div><div class="scen-name">${s.id}. ${s.name}</div><div class="scen-agent">${badge} · ${s.agent} → ${s.target} · ${s.chain}</div></div>
+      <div class="scen-amount">${amt}</div>
+      <div class="scen-status">—</div>
+    </div>`;
+  }).join('');
+}
+render();
+</script>
 </body>
 </html>
