@@ -1,0 +1,119 @@
+{
+  "total_payments": 8,
+  "total_volume_usdc": 141.00105050000002,
+  "by_protocol": {
+    "x402": {
+      "count": 3,
+      "volume_usdc": 25.03,
+      "errors": 0,
+      "avg_latency_ms": 2000
+    },
+    "circle-nanopayments": {
+      "count": 4,
+      "volume_usdc": 99.98105050000001,
+      "errors": 1,
+      "avg_latency_ms": 1500
+    },
+    "stripe-spt": {
+      "count": 1,
+      "volume_usdc": 15.99,
+      "errors": 0,
+      "avg_latency_ms": 2000
+    }
+  },
+  "error_traces": [
+    {
+      "payment_id": "0a3a4bd385d83012",
+      "protocol": "circle-nanopayments",
+      "amount": "$0.000000",
+      "events": 1,
+      "latency_ms": null,
+      "complete": false,
+      "errors": true,
+      "settlement_time_ms": null
+    }
+  ],
+  "pending_traces": [],
+  "recent_traces": [
+    {
+      "payment_id": "055b639a6b1ad7c7",
+      "protocol": "x402",
+      "amount": "$0.010000",
+      "events": 7,
+      "latency_ms": 2000,
+      "complete": true,
+      "errors": false,
+      "settlement_time_ms": 1780665443061
+    },
+    {
+      "payment_id": "be9ceeb0e45d776d",
+      "protocol": "x402",
+      "amount": "$0.020000",
+      "events": 7,
+      "latency_ms": 2000,
+      "complete": true,
+      "errors": false,
+      "settlement_time_ms": 1780665443061
+    },
+    {
+      "payment_id": "835addc4d3b2d956",
+      "protocol": "x402",
+      "amount": "$25.000000",
+      "events": 7,
+      "latency_ms": 2000,
+      "complete": true,
+      "errors": false,
+      "settlement_time_ms": 1780665443061
+    },
+    {
+      "payment_id": "9d89cca0ffd74936",
+      "protocol": "circle-nanopayments",
+      "amount": "$0.000050",
+      "events": 7,
+      "latency_ms": 2000,
+      "complete": true,
+      "errors": false,
+      "settlement_time_ms": 1780665443061
+    },
+    {
+      "payment_id": "b78bac00f6e9aa95",
+      "protocol": "circle-nanopayments",
+      "amount": "$0.001000",
+      "events": 7,
+      "latency_ms": 2000,
+      "complete": true,
+      "errors": false,
+      "settlement_time_ms": 1780665443061
+    },
+    {
+      "payment_id": "0a3a4bd385d83012",
+      "protocol": "circle-nanopayments",
+      "amount": "$0.000000",
+      "events": 1,
+      "latency_ms": null,
+      "complete": false,
+      "errors": true,
+      "settlement_time_ms": null
+    },
+    {
+      "payment_id": "c326ed68023a6364",
+      "protocol": "circle-nanopayments",
+      "amount": "$99.980000",
+      "events": 7,
+      "latency_ms": 2000,
+      "complete": true,
+      "errors": false,
+      "settlement_time_ms": 1780665443061
+    },
+    {
+      "payment_id": "cd0661d77ce05806",
+      "protocol": "stripe-spt",
+      "amount": "$15.990000",
+      "events": 5,
+      "latency_ms": 2000,
+      "complete": true,
+      "errors": false,
+      "settlement_time_ms": 1780665443061
+    }
+  ]
+}
