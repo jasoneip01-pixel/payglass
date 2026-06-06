@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PayGlass — Agent 支付观测站</title>
+<style>
+  :root {
+    --bg: #0a0a0f; --surface: #14141f; --border: #252540;
+    --text: #e0e0f0; --muted: #707090;
+    --green: #00e676; --yellow: #ffd740; --red: #ff5252;
+    --blue: #448aff; --purple: #b388ff; --cyan: #18ffff;
+    --radius: 10px;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--bg); color: var(--text);
+    min-height: 100vh; overflow-x: hidden;
+  }
+
+  /* Nav */
+  nav {
+    background: var(--surface); border-bottom: 1px solid var(--border);
+    padding: 0 24px; position: sticky; top: 0; z-index: 10;
+  }
+  nav .inner {
+    max-width: 1000px; margin: 0 auto; display: flex; gap: 24px;
+    align-items: center; height: 56px;
+  }
+  nav a {
+    color: var(--muted); text-decoration: none; font-size: 0.9rem;
+    transition: color 0.2s;
+  }
+  nav a:hover, nav a.active { color: var(--text); }
+  nav .brand {
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--cyan), var(--purple));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    font-size: 1.1rem; margin-right: auto;
+  }
+  nav .brand:hover { opacity: 0.8; }
+  nav .spacer { margin-left: auto; }
+
+  /* Hero */
+  .hero {
+    text-align: center; padding: 100px 24px 60px;
+    background: radial-gradient(ellipse at 50% 0%, rgba(24,255,255,0.08) 0%, transparent 70%);
+  }
+  .hero h1 {
+    font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 700;
+    background: linear-gradient(135deg, var(--cyan) 0%, #84ffff 30%, var(--purple) 70%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    margin-bottom: 16px;
+  }
+  .hero .tagline {
+    font-size: 1.2rem; color: var(--muted); max-width: 600px; margin: 0 auto 32px;
+    line-height: 1.6;
+  }
+  .hero .cta {
+    display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;
+  }
+  .btn {
+    padding: 12px 28px; border-radius: 8px; font-size: 0.95rem; font-weight: 600;
+    text-decoration: none; transition: all 0.2s; cursor: pointer; border: none;
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--cyan), var(--purple));
+    color: #fff;
+  }
+  .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
+  .btn-ghost {
+    background: transparent; border: 1px solid var(--border); color: var(--text);
+  }
+  .btn-ghost:hover { border-color: var(--cyan); color: var(--cyan); }
+
+  /* Tracks */
+  .section { max-width: 1000px; margin: 0 auto; padding: 48px 24px; }
+  .section h2 {
+    font-size: 1.5rem; font-weight: 600; margin-bottom: 24px;
+    text-align: center;
+  }
+  .tracks-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 16px;
+  }
+  .track-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 24px;
+    transition: border-color 0.2s;
+  }
+  .track-card:hover { border-color: var(--muted); }
+  .track-card .icon { font-size: 2rem; margin-bottom: 12px; }
+  .track-card h3 { font-size: 1.1rem; font-weight: 600; margin-bottom: 8px; }
+  .track-card p { color: var(--muted); font-size: 0.9rem; line-height: 1.5; margin-bottom: 12px; }
+  .track-card .badge {
+    display: inline-block; padding: 3px 10px; border-radius: 4px;
+    font-size: 0.75rem; font-weight: 600;
+  }
+  .badge-live { background: rgba(0,230,118,0.15); color: var(--green); }
+  .badge-beta { background: rgba(255,215,64,0.15); color: var(--yellow); }
+
+  /* Pipeline */
+  .pipeline-viz {
+    display: flex; align-items: center; justify-content: center;
+    gap: 8px; padding: 32px 0; overflow-x: auto; flex-wrap: wrap;
+  }
+  .pipe-node {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 14px 18px;
+    text-align: center; min-width: 100px;
+  }
+  .pipe-node .label { font-size: 0.75rem; font-weight: 600; }
+  .pipe-node .time { font-size: 0.7rem; color: var(--muted); margin-top: 2px; }
+  .pipe-arrow { color: var(--muted); font-size: 1.2rem; }
+
+  /* Stats */
+  .stats-row {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px; margin-bottom: 32px;
+  }
+  .stat {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 16px; text-align: center;
+  }
+  .stat .num { font-size: 1.8rem; font-weight: 700; }
+  .stat .lbl { font-size: 0.75rem; color: var(--muted); text-transform: uppercase; margin-top: 4px; }
+  .num.green { color: var(--green); }
+  .num.cyan { color: var(--cyan); }
+  .num.purple { color: var(--purple); }
+  .num.blue { color: var(--blue); }
+  .num.yellow { color: var(--yellow); }
+
+  /* Footer */
+  footer {
+    text-align: center; padding: 48px 24px;
+    border-top: 1px solid var(--border); color: var(--muted); font-size: 0.85rem;
+  }
+  footer a { color: var(--cyan); text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
+
+  /* ═══════════════════════════════════════════════
+     Responsive — Mobile · Tablet · Desktop · Wide
+     ═══════════════════════════════════════════════ */
+
+  /* Tablet (481–768px) */
+  @media (max-width: 768px) {
+    .hero { padding: 64px 20px 48px; }
+    .hero h1 { font-size: 2.2rem; }
+    .hero .tagline { font-size: 1rem; max-width: 420px; }
+    .btn { padding: 10px 22px; font-size: 0.9rem; }
+    .section { padding: 36px 20px; }
+    .section h2 { font-size: 1.3rem; }
+    .tracks-grid { grid-template-columns: 1fr; }
+    .stats-row { grid-template-columns: repeat(2, 1fr); }
+    .pipeline-viz { gap: 4px; padding: 24px 0; }
+    .pipe-node { padding: 10px 12px; min-width: 80px; }
+    footer { padding: 32px 20px; font-size: 0.8rem; }
+  }
+
+  /* Mobile (< 481px) */
+  @media (max-width: 480px) {
+    .hero { padding: 40px 14px 32px; }
+    .hero h1 { font-size: 1.8rem; }
+    .hero .tagline { font-size: 0.9rem; max-width: 100%; }
+    .hero .cta { flex-direction: column; align-items: stretch; }
+    .btn { padding: 12px 16px; font-size: 0.85rem; text-align: center; width: 100%; }
+    .section { padding: 28px 14px; }
+    .section h2 { font-size: 1.15rem; }
+    .stats-row { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+    .stat { padding: 12px 10px; }
+    .stat .num { font-size: 1.4rem; }
+    .stat .lbl { font-size: 0.65rem; }
+    .pipeline-viz { padding: 16px 0; }
+    .pipe-node { padding: 8px 10px; min-width: 65px; }
+    .pipe-node .label { font-size: 0.65rem; }
+    .pipe-node .time { font-size: 0.6rem; }
+    .pipe-arrow { display: none; }
+    .track-card { padding: 18px; }
+    .track-card h3 { font-size: 1rem; }
+    .track-card p { font-size: 0.82rem; }
+    footer { padding: 24px 14px; font-size: 0.75rem; }
+    footer p { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+  }
+
+  /* Wide (> 1400px) — comfortable reading width */
+  @media (min-width: 1400px) {
+    .section { max-width: 1100px; }
+  }
+</style>
+</head>
+<body>
+<nav>
+  <div class="inner">
+    <a href="index-zh.html" class="brand">PayGlass</a>
+    <a href="product-zh.html">产品定义书</a>
+    <a href="docs-zh.html">技术文档</a>
+    <a href="demo-zh.html">Demo</a>
+    <a href="dashboard/">Dashboard</a>
+  </div>
+</nav>
+
+<div class="hero">
+  <h1>PayGlass</h1>
+  <p class="tagline">
+    <strong>运握科技 — Agent 支付控制面的观测组件</strong>。<br>
+    始于 PayGlass，进化为 PayRoute。<br>
+    一面玻璃，看尽 Stripe SPT · x402 · Circle Nanopayments 的所有支付流量。<br>
+    <span style="color:var(--yellow);font-size:0.9rem;">🔍 不只是观测——自动识别重放攻击、重复支付、批次卡住</span>
+  </p>
+  <div class="cta">
+    <a href="dashboard/" class="btn btn-primary">🚀 打开 Dashboard</a>
+    <a href="product-zh.html" class="btn btn-ghost">📋 产品定义书</a>
+    <a href="docs-zh.html" class="btn btn-ghost">📖 技术文档</a>
+    <a href="demo-zh.html" class="btn btn-ghost">🧪 Demo</a>
+    <a href="https://jasoneip01-pixel.github.io/payroute/product-zh.html" class="btn btn-ghost" style="border-color:var(--purple);color:var(--purple);">← 了解 PayRoute 全栈能力</a>
+  </div>
+</div>
+
+<div class="section">
+  <div class="stats-row">
+    <div class="stat"><div class="num cyan">3</div><div class="lbl">协议覆盖</div></div>
+    <div class="stat"><div class="num green">$0</div><div class="lbl">单笔 Gas</div></div>
+    <div class="stat"><div class="num purple">11</div><div class="lbl">链支持</div></div>
+    <div class="stat"><div class="num blue">&lt;1s</div><div class="lbl">验证速度</div></div>
+    <div class="stat"><div class="num yellow">8</div><div class="lbl">安全检测项</div></div>
+  </div>
+
+  <h2>三条轨道，一面玻璃</h2>
+  <div class="tracks-grid">
+    <div class="track-card">
+      <div class="icon">🔗</div>
+      <h3>x402 Protocol</h3>
+      <p>HTTP 原生支付标准。402 Payment Required → EIP-3009 签名 → Gateway 批量结算。无账户，无会话，支付嵌入 HTTP 请求本身。</p>
+      <span class="badge badge-live">已发布</span>
+    </div>
+    <div class="track-card">
+      <div class="icon">💎</div>
+      <h3>Circle Nanopayments</h3>
+      <p>Gas-free USDC 微支付。$0.000001 起，TEE 验证，11 条链批量结算。Agent 经济的金融轨道。</p>
+      <span class="badge badge-live">主网 · 2026-05</span>
+    </div>
+    <div class="track-card">
+      <div class="icon">🌐</div>
+      <h3>Stripe Agent OS</h3>
+      <p>从支付处理器进化为 Agent 商业全栈 OS。SPT 令牌 + Link Agent Wallet + MPP 商户协议。</p>
+      <span class="badge badge-beta">Private Preview</span>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h2>支付流 — 从签名到结算</h2>
+  <div class="pipeline-viz">
+    <div class="pipe-node"><div class="label">EIP-3009</div><div class="time">离线签名</div></div>
+    <span class="pipe-arrow">→</span>
+    <div class="pipe-node"><div class="label">TEE</div><div class="time">Nitro 验证</div></div>
+    <span class="pipe-arrow">→</span>
+    <div class="pipe-node"><div class="label">扣减</div><div class="time">&lt;1 秒</div></div>
+    <span class="pipe-arrow">→</span>
+    <div class="pipe-node"><div class="label">交付</div><div class="time">资源返回</div></div>
+    <span class="pipe-arrow">→</span>
+    <div class="pipe-node"><div class="label">批量</div><div class="time">聚合</div></div>
+    <span class="pipe-arrow">→</span>
+    <div class="pipe-node"><div class="label">结算</div><div class="time">链上确认</div></div>
+  </div>
+  <p style="text-align:center;color:var(--muted);font-size:0.85rem;">
+    PayGlass 追踪每一步——从 EIP-3009 签名到链上结算，无盲区。
+  </p>
+</div>
+
+<div class="section">
+  <h2>为什么是现在</h2>
+  <div class="tracks-grid">
+    <div class="track-card">
+      <h3>🏗️ 三条轨道在建</h3>
+      <p>Stripe、x402、Circle 同时在建 Agent 支付基建。碎片化峰值 = 观测层最大窗口。</p>
+    </div>
+    <div class="track-card">
+      <h3>🔍 无人做观测</h3>
+      <p>Etherscan 能看到链上结算，但看不到链下的签名→验证→批量过程。这是开发者最痛的调试盲区。</p>
+    </div>
+    <div class="track-card">
+      <h3>⏳ 12-18 个月窗口</h3>
+      <p>在 Stripe/Circle 统一底层之前，PayGlass 是唯一不需要选边的观测层。</p>
+    </div>
+    <div class="track-card">
+      <h3>⚠️ 安全风控</h3>
+      <p>arXiv 最新研究揭示 x402 存在重放攻击、paid-but-denied 等系统性风险。PayGlass trace 数据天然是安全审计层。</p>
+    </div>
+    <div class="track-card">
+      <h3>📡 OpenTelemetry 兼容</h3>
+      <p>不创造新标准——接入现有 DevOps Stack 的支付扩展。PayGlass 是已有观测体系的 payment extension。</p>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <p>
+    <a href="product-zh.html">📋 产品定义书</a> · 
+    <a href="docs-zh.html">📖 技术文档</a> · 
+    <a href="demo-zh.html">🧪 Demo</a> · 
+    <a href="dashboard/">📊 Dashboard</a>
+  </p>
+  <p style="margin-top:8px;">PayGlass v0.1.0 · 可观测 + 安全风控 · 不是支付协议——是位于所有协议之上的一面玻璃。</p>
+</footer>
+
+</body>
+</html>
