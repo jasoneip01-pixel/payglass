@@ -137,7 +137,7 @@
 </nav>
 
 <main>
-<h1>📋 产品定义说明书</h1>
+<h1>📄 产品定义说明书</h1>
 <p class="subtitle">v0.1.0 · 2026-06-06 · 更新版<br><em>一句话定位：Agent 支付世界的 Datadog + Sentry——可观测 + 安全风控，一面玻璃看尽所有 Agent 支付流量。</em></p>
 
 <!-- 1 -->
@@ -349,7 +349,7 @@ payglass.dashboard()    # Web UI</pre>
   <thead><tr><th>风险类型</th><th>描述</th><th>检测方法</th><th>严重度</th></tr></thead>
   <tbody>
     <tr><td><strong>🔁 重放攻击</strong></td><td>同一签名被多次提交</td><td>nonce 重复检测</td><td><span class="badge badge-p0">高</span></td></tr>
-    <tr><td><strong>📋 重复支付</strong></td><td>同一支付意图触发多次结算</td><td>trace_id 唯一性验证</td><td><span class="badge badge-p0">高</span></td></tr>
+    <tr><td><strong>🔄 重复支付</strong></td><td>同一支付意图触发多次结算</td><td>trace_id 唯一性验证</td><td><span class="badge badge-p0">高</span></td></tr>
     <tr><td><strong>⛔ Paid-but-Denied</strong></td><td>签名已确认但资源未交付</td><td>签名事件 → 无交付事件检测</td><td><span class="badge badge-p0">高</span></td></tr>
     <tr><td><strong>👻 Unpaid-but-Served</strong></td><td>资源已交付但无对应付款</td><td>资源交付 → 无对应签名事件检测</td><td><span class="badge badge-p0">高</span></td></tr>
     <tr><td><strong>🔗 绑定不匹配</strong></td><td>签名绑定的资源与交付的资源不一致</td><td>EIP-3009 request-binding 字段验证</td><td><span class="badge badge-p0">高</span></td></tr>
