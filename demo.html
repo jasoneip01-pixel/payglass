@@ -269,7 +269,7 @@ async function runScenario(scen, idx) {
   row.classList.add('running');
   row.querySelector('.scen-status').textContent = 'running...';
 
-  const trackEmoji = scen.track === 'x402' ? '🔗' : scen.track === 'nano' ? '💎' : '🛒';
+  const trackEmoji = scen.track === 'x402' ? '🔗' : scen.track === 'nano' ? '💎' : '🌐';
   const stubNote = scen.stub ? ' [STUB]' : '';
   log('info', `${trackEmoji} Scenario ${scen.id}: ${scen.name} — $${scen.amount < 0.01 ? scen.amount.toFixed(6) : scen.amount.toFixed(2)}${stubNote}`);
   document.getElementById('pipe-label').textContent = `${scen.agent} → ${scen.target}`;
@@ -357,7 +357,7 @@ function resetAll() {
 function render() {
   const el = document.getElementById('scenarios');
   el.innerHTML = SCENARIOS.map((s, i) => {
-    const badge = s.track === 'x402' ? '🔗 x402' : s.track === 'nano' ? '💎 Nano' : '🛒 SPT';
+    const badge = s.track === 'x402' ? '🔗 x402' : s.track === 'nano' ? '💎 Nano' : '🌐 SPT';
     const amt = s.amount < 0.01 ? '$' + s.amount.toFixed(6) : '$' + s.amount.toFixed(2);
     return `<div class="scen-row" onclick="if(!running)runScenario(SCENARIOS[${i}],${i})">
       <div><div class="scen-name">${s.id}. ${s.name}</div><div class="scen-agent">${badge} · ${s.agent} → ${s.target} · ${s.chain}</div></div>
