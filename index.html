@@ -106,6 +106,7 @@
   .num.cyan { color: var(--cyan); }
   .num.purple { color: var(--purple); }
   .num.blue { color: var(--blue); }
+  .num.yellow { color: var(--yellow); }
 
   /* Footer */
   footer {
@@ -170,8 +171,9 @@
 <div class="hero">
   <h1>PayGlass</h1>
   <p class="tagline">
-    Agent 支付世界的 Datadog。<br>
-    一面玻璃，看尽 Stripe SPT · x402 · Circle Nanopayments 的所有支付流量。
+    Agent 支付世界的 <strong>Datadog + Sentry</strong>。<br>
+    一面玻璃，看尽 Stripe SPT · x402 · Circle Nanopayments 的所有支付流量。<br>
+    <span style="color:var(--yellow);font-size:0.9rem;">🔍 不只是观测——自动识别重放攻击、重复支付、批次卡住</span>
   </p>
   <div class="cta">
     <a href="dashboard/" class="btn btn-primary">🚀 打开 Dashboard</a>
@@ -187,6 +189,7 @@
     <div class="stat"><div class="num green">$0</div><div class="lbl">Per-Payment Gas</div></div>
     <div class="stat"><div class="num purple">11</div><div class="lbl">链支持</div></div>
     <div class="stat"><div class="num blue">&lt;1s</div><div class="lbl">验证速度</div></div>
+    <div class="stat"><div class="num yellow">8</div><div class="lbl">安全检测项</div></div>
   </div>
 
   <h2>三条轨道，一面玻璃</h2>
@@ -247,6 +250,14 @@
       <h3>⏳ 12-18 个月窗口</h3>
       <p>在 Stripe/Circle 统一底层之前，PayGlass 是唯一不需要选边的观测层。</p>
     </div>
+    <div class="track-card">
+      <h3>⚠️ 安全风控</h3>
+      <p>arXiv 最新研究揭示 x402 存在重放攻击、paid-but-denied 等系统性风险。PayGlass trace 数据天然是安全审计层。</p>
+    </div>
+    <div class="track-card">
+      <h3>🔌 OpenTelemetry 兼容</h3>
+      <p>不创造新标准——接入现有 DevOps Stack 的支付扩展。PayGlass 是已有观测体系的 payment extension。</p>
+    </div>
   </div>
 </div>
 
@@ -257,7 +268,7 @@
     <a href="demo.html">🧪 Demo</a> · 
     <a href="dashboard/">📊 Dashboard</a>
   </p>
-  <p style="margin-top:8px;">PayGlass v0.1.0 · Built for the agentic economy. Not a payment protocol — the glass above them all.</p>
+  <p style="margin-top:8px;">PayGlass v0.1.0 · 可观测 + 安全风控 · Not a payment protocol — the glass above them all.</p>
 </footer>
 
 </body>
