@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Demo · PayGlass</title>
+<style>
+  :root {
+    --bg: #0a0a0f; --surface: #14141f; --border: #252540;
+    --text: #e0e0f0; --muted: #707090;
+    --green: #00e676; --yellow: #ffd740; --red: #ff5252;
+    --blue: #448aff; --purple: #b388ff; --cyan: #18ffff;
+    --radius: 10px; --max-w: 900px;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, monospace;
+    background: var(--bg); color: var(--text); line-height: 1.6;
+  }
+  nav {
+    background: var(--surface); border-bottom: 1px solid var(--border);
+    padding: 0 24px; position: sticky; top: 0; z-index: 10;
+  }
+  nav .inner { max-width: var(--max-w); margin: 0 auto; display: flex; gap: 24px; align-items: center; height: 56px; }
+  nav a { color: var(--muted); text-decoration: none; font-size: 0.9rem; transition: color 0.2s; }
+  nav a:hover, nav a.active { color: var(--text); }
+  nav .brand { font-weight: 700; background: linear-gradient(135deg, var(--cyan), var(--purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 1.1rem; }
+
+  main { max-width: var(--max-w); margin: 0 auto; padding: 40px 24px; }
+
+  /* Controls */
+  .controls { display: flex; gap: 10px; flex-wrap: wrap; margin: 20px 0; align-items: center; }
+  .btn {
+    padding: 8px 18px; border-radius: 6px; font-size: 0.85rem; font-weight: 600;
+    cursor: pointer; border: 1px solid var(--border); background: var(--surface);
+    color: var(--text); transition: all 0.15s;
+  }
+  .btn:hover { border-color: var(--cyan); color: var(--cyan); }
+  .btn-run { background: linear-gradient(135deg, var(--cyan), var(--purple)); color: #fff; border: none; }
+  .btn-run:hover { opacity: 0.9; color: #fff; }
+  .btn-reset { border-color: var(--red); color: var(--red); }
+  .btn-reset:hover { background: rgba(255,82,82,0.1); }
+
+  /* Stats */
+  .stats-bar { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 16px 0; }
+  .stat-mini { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px; text-align: center; }
+  .stat-mini .val { font-size: 1.4rem; font-weight: 700; }
+  .stat-mini .lbl { font-size: 0.7rem; color: var(--muted); text-transform: uppercase; }
+
+  /* Pipeline */
+  .pipeline-box { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; margin: 20px 0; }
+  .pipeline-box h3 { font-size: 0.9rem; color: var(--muted); margin-bottom: 14px; text-transform: uppercase; letter-spacing: 0.05em; }
+  .pipe-row { display: flex; align-items: center; gap: 6px; overflow-x: auto; padding: 4px 0; }
+  .pipe-step {
+    background: var(--bg); border: 1px solid var(--border); border-radius: 6px;
+    padding: 10px 12px; text-align: center; min-width: 90px; flex-shrink: 0; transition: all 0.3s;
+  }
+  .pipe-step.active { border-color: var(--cyan); box-shadow: 0 0 12px rgba(24,255,255,0.2); }
+  .pipe-step.done { border-color: var(--green); }
+  .pipe-step.fail { border-color: var(--red); background: rgba(255,82,82,0.08); }
+  .pipe-step .sn { font-size: 0.65rem; color: var(--muted); }
+  .pipe-step .se { font-size: 0.75rem; font-weight: 600; }
+  .pipe-step .ss { font-size: 0.65rem; margin-top: 2px; }
+  .pipe-arr { color: var(--muted); font-size: 0.9rem; flex-shrink: 0; }
+
+  /* Scenarios */
+  .scenario-list { display: grid; gap: 8px; margin: 16px 0; }
+  .scen-row {
+    display: grid; grid-template-columns: 1fr auto auto auto;
+    align-items: center; gap: 12px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 6px; padding: 12px 16px; transition: border-color 0.2s;
+    cursor: pointer; font-size: 0.85rem;
+  }
+  .scen-row:hover { border-color: var(--cyan); }
+  .scen-row.running { border-color: var(--cyan); box-shadow: 0 0 8px rgba(24,255,255,0.15); }
+  .scen-row.done { border-color: var(--green); }
+  .scen-row.failed { border-color: var(--red); }
+  .scen-name { font-weight: 600; }
+  .scen-agent { color: var(--muted); font-size: 0.78rem; }
+  .scen-amount { font-weight: 600; font-size: 0.85rem; }
+  .scen-status { font-size: 0.75rem; width: 60px; text-align: right; }
+
+  /* Log */
+  .log-box { background: #000; border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; margin: 20px 0; max-height: 300px; overflow-y: auto; font-size: 0.8rem; }
+  .log-line { padding: 2px 0; font-family: 'Menlo', 'Consolas', monospace; }
+  .log-ts { color: var(--muted); margin-right: 8px; }
+  .log-ok { color: var(--green); }
+  .log-warn { color: var(--yellow); }
+  .log-err { color: var(--red); }
+  .log-info { color: var(--cyan); }
+
+  footer {
+    text-align: center; padding: 40px 24px; border-top: 1px solid var(--border);
+    color: var(--muted); font-size: 0.85rem;
+  }
+  footer a { color: var(--cyan); text-decoration: none; }
+
+  /* ═══════════════════════════════════════════════
+     Responsive — Mobile · Tablet · Desktop · Wide
+     ═══════════════════════════════════════════════ */
+
+  /* Tablet (481–768px) */
+  @media (max-width: 768px) {
+    nav .inner { gap: 14px; height: 48px; overflow-x: auto; }
+    nav a { font-size: 0.8rem; white-space: nowrap; }
+    main { padding: 32px 18px; }
+    h1 { font-size: 1.6rem; }
+    h2 { font-size: 1.2rem; }
+    .subtitle { font-size: 0.85rem; }
+    .doc-grid, .two-col, .tracks-grid { grid-template-columns: 1fr; }
+    .summary-grid { grid-template-columns: repeat(2, 1fr); }
+    pre { font-size: 0.78rem; padding: 12px; overflow-x: auto; }
+    table { font-size: 0.8rem; display: block; overflow-x: auto; }
+    th, td { padding: 8px 10px; white-space: nowrap; }
+    footer { padding: 28px 18px; font-size: 0.8rem; }
+  }
+
+  /* Mobile (< 481px) */
+  @media (max-width: 480px) {
+    nav .inner { gap: 10px; height: 44px; padding: 0 4px; }
+    nav a { font-size: 0.72rem; padding: 4px 2px; }
+    nav .brand { font-size: 0.9rem; }
+    main { padding: 24px 12px; }
+    h1 { font-size: 1.4rem; }
+    h2 { font-size: 1.1rem; margin-top: 32px; }
+    h3 { font-size: 0.95rem; }
+    p, li { font-size: 0.85rem; }
+    pre { font-size: 0.7rem; padding: 10px; max-width: 100vw; overflow-x: scroll; }
+    code { font-size: 0.75rem; word-break: break-all; }
+    table { font-size: 0.7rem; }
+    th, td { padding: 6px 8px; }
+    .badge { font-size: 0.65rem; padding: 2px 6px; }
+    .callout { padding: 12px 14px; margin: 12px 0; }
+    .scenario-detail { grid-template-columns: 1fr !important; }
+    .scen-row { grid-template-columns: 1fr auto auto !important; padding: 10px 12px; gap: 6px; font-size: 0.78rem; }
+    .stats-bar { grid-template-columns: repeat(2, 1fr); gap: 6px; }
+    .stat-mini { padding: 10px; }
+    .stat-mini .val { font-size: 1.1rem; }
+    .pipe-step { min-width: 55px !important; padding: 6px 8px !important; }
+    .pipe-step .se { font-size: 0.65rem; }
+    .pip-arr { display: none; }
+    .log-box { max-height: 200px; font-size: 0.7rem; }
+    .controls { gap: 6px; }
+    .btn { padding: 10px 14px; font-size: 0.78rem; min-height: 40px; }
+    footer { padding: 20px 12px; font-size: 0.7rem; }
+    footer p { flex-wrap: wrap; gap: 6px; justify-content: center; }
+  }
+
+  /* Wide (> 1400px) — comfortable reading width */
+  @media (min-width: 1400px) {
+    main { max-width: 960px; }
+  }
+
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="inner">
+    <a href="index-zh.html" class="brand">PayGlass</a>
+    <a href="product-zh.html">产品定义书</a>
+    <a href="docs-zh.html">技术文档</a>
+    <a href="demo-zh.html" class="active">Demo</a>
+    <a href="dashboard/">Dashboard</a>
+  </div>
+</nav>
+
+<main>
+<h1>🧪 Live Demo</h1>
+<p style="color:var(--muted);margin-bottom:4px;">点击场景卡片运行支付追踪。管线实时动画，日志同步输出。</p>
+
+<div class="controls">
+  <button class="btn btn-run" onclick="runAll()">▶ 运行全部 (8 scenarios)</button>
+  <button class="btn btn-reset" onclick="resetAll()">↺ 重置</button>
+  <span style="font-size:0.8rem;color:var(--muted);margin-left:8px;">或点击下方单条场景</span>
+</div>
+
+<div class="stats-bar">
+  <div class="stat-mini"><div class="val" id="st-count" style="color:var(--cyan);">0</div><div class="lbl">Payments</div></div>
+  <div class="stat-mini"><div class="val" id="st-volume" style="color:var(--purple);">$0</div><div class="lbl">Volume</div></div>
+  <div class="stat-mini"><div class="val" id="st-ok" style="color:var(--green);">0</div><div class="lbl">Settled</div></div>
+  <div class="stat-mini"><div class="val" id="st-err" style="color:var(--red);">0</div><div class="lbl">Errors</div></div>
+</div>
+
+<div class="pipeline-box">
+  <h3>📡 Live Payment Pipeline <span id="pipe-label" style="font-weight:400;font-size:0.75rem;color:var(--muted);"></span></h3>
+  <div class="pipe-row" id="pipe-row">
+    <div class="pipe-step" id="ps0"><div class="sn">1</div><div class="se">402</div><div class="ss">—</div></div>
+    <span class="pipe-arr">→</span>
+    <div class="pipe-step" id="ps1"><div class="sn">2</div><div class="se">Sign</div><div class="ss">—</div></div>
+    <span class="pipe-arr">→</span>
+    <div class="pipe-step" id="ps2"><div class="sn">3</div><div class="se">Verify</div><div class="ss">—</div></div>
+    <span class="pipe-arr">→</span>
+    <div class="pipe-step" id="ps3"><div class="sn">4</div><div class="se">Deliver</div><div class="ss">—</div></div>
+    <span class="pipe-arr">→</span>
+    <div class="pipe-step" id="ps4"><div class="sn">5</div><div class="se">Batch</div><div class="ss">—</div></div>
+    <span class="pipe-arr">→</span>
+    <div class="pipe-step" id="ps5"><div class="sn">6</div><div class="se">Settle</div><div class="ss">—</div></div>
+  </div>
+</div>
+
+<div class="scenario-list" id="scenarios"></div>
+
+<div class="log-box" id="log"><div class="log-line"><span class="log-ts">ready</span><span class="log-info">PayGlass Demo Engine v0.1.0 — click a scenario to trace a payment</span></div></div>
+
+</main>
+
+<footer>
+  <p>PayGlass v0.1.0 · <a href="product-zh.html">产品定义书</a> · <a href="docs-zh.html">技术文档</a></p>
+</footer>
+
+<script>
+// ── PayGlass Demo Engine (Browser Runtime) ──────────────────────
+
+const SCENARIOS = [
+  { id:'A', track:'x402', name:'Pay-per-Call LLM API', agent:'research-agent-42', target:'api.openai.com/v1/chat', amount:0.01, chain:'arbitrum', steps:['402_response','signature','payment_header','verification','resource_delivered','batch','settlement'] },
+  { id:'B', track:'x402', name:'Data Oracle Query', agent:'trading-agent-7', target:'oracle.chainlink.com/eth-usd', amount:0.02, chain:'arbitrum', steps:['402_response','signature','payment_header','verification','resource_delivered','batch','settlement'] },
+  { id:'C', track:'x402', name:'Batch Model Inference', agent:'analytics-agent-3', target:'inference.example.com/batch', amount:25.00, chain:'optimism', steps:['402_response','signature','payment_header','verification','resource_delivered','batch','settlement'] },
+  { id:'D', track:'nano', name:'Sub-Cent Price Feed', agent:'data-agent-7', target:'feeds.circle.com/btc-usd', amount:0.000050, chain:'arbitrum', steps:['deposit_check','authorization','tee_verification','balance_deduction','resource_delivered','batch','settlement'] },
+  { id:'E', track:'nano', name:'API Metering at Scale', agent:'monitor-agent-1', target:'metrics.example.com/api/v2', amount:0.001, chain:'arbitrum', steps:['deposit_check','authorization','tee_verification','balance_deduction','resource_delivered','batch','settlement'] },
+  { id:'F', track:'nano', name:'⚠️ Below Minimum — VALIDATION GATE', agent:'test-agent-0', target:'test.example.com/ping', amount:0.0000005, chain:'arbitrum', steps:['validation'], fail:true, failMsg:'Amount $5e-07 below minimum $1e-06' },
+  { id:'G', track:'nano', name:'Wallet Top-Up (Large Nano)', agent:'treasury-agent-0', target:'gateway.circle.com/deposit', amount:99.98, chain:'arbitrum', steps:['deposit_check','authorization','tee_verification','balance_deduction','resource_delivered','batch','settlement'] },
+  { id:'H', track:'spt', name:'E-Commerce Checkout', agent:'shopping-agent-3', target:'shop.example.com/checkout', amount:15.99, chain:'—', steps:['session_init','token_create','authorization','payment_complete','settlement'], stub:true },
+];
+
+const STEP_LABELS = {
+  '402_response':'402','signature':'Sign','payment_header':'PayHdr','verification':'Verify','resource_delivered':'Deliver','batch':'Batch','settlement':'Settle',
+  'deposit_check':'Deposit','authorization':'Auth','tee_verification':'TEE','balance_deduction':'Deduct',
+  'session_init':'Session','token_create':'Token','payment_complete':'Complete',
+  'validation':'Validate'
+};
+
+let stats = { count:0, volume:0, ok:0, err:0 };
+let running = false;
+
+function log(level, msg) {
+  const el = document.getElementById('log');
+  const cls = level === 'ok' ? 'log-ok' : level === 'err' ? 'log-err' : level === 'warn' ? 'log-warn' : 'log-info';
+  const ts = new Date().toLocaleTimeString();
+  el.innerHTML += `<div class="log-line"><span class="log-ts">${ts}</span><span class="${cls}">${msg}</span></div>`;
+  el.scrollTop = el.scrollHeight;
+}
+
+function updateStats() {
+  document.getElementById('st-count').textContent = stats.count;
+  document.getElementById('st-volume').textContent = '$' + stats.volume.toFixed(stats.volume < 0.01 ? 6 : 2);
+  document.getElementById('st-ok').textContent = stats.ok;
+  document.getElementById('st-err').textContent = stats.err;
+}
+
+function resetPipeline() {
+  for (let i=0; i<6; i++) {
+    const el = document.getElementById('ps'+i);
+    if (el) { el.className = 'pipe-step'; el.querySelector('.ss').textContent = '—'; }
+  }
+  document.getElementById('pipe-label').textContent = '';
+}
+
+function highlightStep(idx, status) {
+  const el = document.getElementById('ps'+idx);
+  if (!el) return;
+  el.className = 'pipe-step ' + status;
+  el.querySelector('.ss').textContent = status === 'active' ? '...' : status === 'done' ? '✓' : '✗';
+}
+
+async function runScenario(scen, idx) {
+  const row = document.querySelectorAll('.scen-row')[idx];
+  row.classList.add('running');
+  row.querySelector('.scen-status').textContent = 'running...';
+
+  const trackEmoji = scen.track === 'x402' ? '🔗' : scen.track === 'nano' ? '💎' : '🌐';
+  const stubNote = scen.stub ? ' [STUB]' : '';
+  log('info', `${trackEmoji} Scenario ${scen.id}: ${scen.name} — $${scen.amount < 0.01 ? scen.amount.toFixed(6) : scen.amount.toFixed(2)}${stubNote}`);
+  document.getElementById('pipe-label').textContent = `${scen.agent} → ${scen.target}`;
+
+  resetPipeline();
+  const maxSteps = Math.min(scen.steps.length, 6);
+  const startIdx = Math.max(0, 6 - maxSteps);
+
+  for (let i = 0; i < maxSteps; i++) {
+    const pidx = startIdx + i;
+    const el = document.getElementById('ps'+pidx);
+    if (el) {
+      el.querySelector('.se').textContent = STEP_LABELS[scen.steps[i]] || scen.steps[i];
+      el.querySelector('.sn').textContent = pidx + 1;
+    }
+  }
+  // Clear unused steps
+  for (let i = 0; i < startIdx; i++) {
+    const el = document.getElementById('ps'+i);
+    if (el) { el.querySelector('.se').textContent = '—'; el.querySelector('.ss').textContent = '—'; }
+  }
+
+  for (let i = 0; i < maxSteps; i++) {
+    const pidx = startIdx + i;
+    highlightStep(pidx, 'active');
+    const stepName = scen.steps[i];
+    log('info', `  └─ ${stepName}...`);
+
+    await sleep(scen.fail ? 150 : 300 + Math.random() * 200);
+
+    if (scen.fail && i === 0) {
+      highlightStep(pidx, 'fail');
+      log('err', `  ❌ ${scen.failMsg}`);
+      row.classList.remove('running');
+      row.classList.add('failed');
+      row.querySelector('.scen-status').innerHTML = '<span style="color:var(--red);">❌ blocked</span>';
+      stats.count++; stats.err++;
+      updateStats();
+      return;
+    }
+
+    highlightStep(pidx, 'done');
+    if (i < maxSteps - 1) {
+      log('ok', `  ✅ ${stepName} (${Math.round(50 + Math.random()*300)}ms)`);
+    }
+  }
+
+  await sleep(400);
+  stats.count++; stats.ok++; stats.volume += scen.amount;
+  updateStats();
+
+  row.classList.remove('running');
+  row.classList.add('done');
+  const totalMs = Math.round(800 + Math.random() * 2000);
+  const latency = scen.stub ? '~2s (est.)' : totalMs + 'ms';
+  row.querySelector('.scen-status').innerHTML = `<span style="color:var(--green);">✓ ${latency}</span>`;
+  log('ok', `🏁 Settled — trace ${scen.id.toLowerCase()}${Math.random().toString(36).slice(2,6)} · ${scen.chain}`);
+}
+
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+async function runAll() {
+  if (running) return;
+  running = true;
+  resetAll();
+  for (let i = 0; i < SCENARIOS.length; i++) {
+    await runScenario(SCENARIOS[i], i);
+    await sleep(500);
+  }
+  log('info', '═══════════════════════════════════════');
+  log('ok', `🎯 All 8 scenarios complete: ${stats.ok} settled, ${stats.err} blocked`);
+  log('info', `   Volume: $${stats.volume.toFixed(2)} · Protocols: x402(3) + Nano(4) + SPT(1)`);
+  running = false;
+}
+
+function resetAll() {
+  stats = { count:0, volume:0, ok:0, err:0 };
+  updateStats();
+  resetPipeline();
+  document.getElementById('log').innerHTML = '<div class="log-line"><span class="log-ts">ready</span><span class="log-info">PayGlass Demo Engine v0.1.0 — click a scenario to trace a payment</span></div>';
+  document.querySelectorAll('.scen-row').forEach(r => { r.classList.remove('running','done','failed'); r.querySelector('.scen-status').textContent = '—'; });
+}
+
+// ── Render ──────────────────────────────────────────────────────
+function render() {
+  const el = document.getElementById('scenarios');
+  el.innerHTML = SCENARIOS.map((s, i) => {
+    const badge = s.track === 'x402' ? '🔗 x402' : s.track === 'nano' ? '💎 Nano' : '🌐 SPT';
+    const amt = s.amount < 0.01 ? '$' + s.amount.toFixed(6) : '$' + s.amount.toFixed(2);
+    return `<div class="scen-row" onclick="if(!running)runScenario(SCENARIOS[${i}],${i})">
+      <div><div class="scen-name">${s.id}. ${s.name}</div><div class="scen-agent">${badge} · ${s.agent} → ${s.target} · ${s.chain}</div></div>
+      <div class="scen-amount">${amt}</div>
+      <div class="scen-status">—</div>
+    </div>`;
+  }).join('');
+}
+render();
+</script>
+</body>
+</html>
