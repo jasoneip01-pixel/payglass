@@ -19,9 +19,32 @@
     min-height: 100vh; overflow-x: hidden;
   }
 
+  /* Nav */
+  nav {
+    background: var(--surface); border-bottom: 1px solid var(--border);
+    padding: 0 24px; position: sticky; top: 0; z-index: 10;
+  }
+  nav .inner {
+    max-width: 1000px; margin: 0 auto; display: flex; gap: 24px;
+    align-items: center; height: 56px;
+  }
+  nav a {
+    color: var(--muted); text-decoration: none; font-size: 0.9rem;
+    transition: color 0.2s;
+  }
+  nav a:hover, nav a.active { color: var(--text); }
+  nav .brand {
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--cyan), var(--purple));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    font-size: 1.1rem; margin-right: auto;
+  }
+  nav .brand:hover { opacity: 0.8; }
+  nav .spacer { margin-left: auto; }
+
   /* Hero */
   .hero {
-    text-align: center; padding: 80px 24px 60px;
+    text-align: center; padding: 100px 24px 60px;
     background: radial-gradient(ellipse at 50% 0%, rgba(24,255,255,0.08) 0%, transparent 70%);
   }
   .hero h1 {
@@ -167,6 +190,15 @@
 </style>
 </head>
 <body>
+<nav>
+  <div class="inner">
+    <a href="index.html" class="brand">PayGlass</a>
+    <a href="product.html">产品定义书</a>
+    <a href="docs.html">技术文档</a>
+    <a href="demo.html">Demo</a>
+    <a href="dashboard/">Dashboard</a>
+  </div>
+</nav>
 
 <div class="hero">
   <h1>PayGlass</h1>
