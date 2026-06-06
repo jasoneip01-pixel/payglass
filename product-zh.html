@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>产品定义书 · PayGlass</title>
+<style>
+  :root {
+    --bg: #0a0a0f; --surface: #14141f; --border: #252540;
+    --text: #e0e0f0; --muted: #707090;
+    --green: #00e676; --yellow: #ffd740; --red: #ff5252;
+    --blue: #448aff; --purple: #b388ff; --cyan: #18ffff;
+    --radius: 10px; --max-w: 820px;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--bg); color: var(--text); line-height: 1.7;
+  }
+
+  nav {
+    background: var(--surface); border-bottom: 1px solid var(--border);
+    padding: 0 24px; position: sticky; top: 0; z-index: 10;
+  }
+  nav .inner { max-width: var(--max-w); margin: 0 auto; display: flex; gap: 24px; align-items: center; height: 56px; }
+  nav a { color: var(--muted); text-decoration: none; font-size: 0.9rem; transition: color 0.2s; }
+  nav a:hover, nav a.active { color: var(--text); }
+  nav .brand { font-weight: 700; background: linear-gradient(135deg, var(--cyan), var(--purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 1.1rem; }
+
+  main { max-width: var(--max-w); margin: 0 auto; padding: 48px 24px; }
+  h1 { font-size: 2rem; margin-bottom: 8px; }
+  .subtitle { color: var(--muted); margin-bottom: 40px; }
+  h2 { font-size: 1.3rem; font-weight: 600; margin: 48px 0 16px; padding-top: 24px; border-top: 1px solid var(--border); }
+  h3 { font-size: 1.05rem; font-weight: 600; margin: 28px 0 12px; color: var(--cyan); }
+  p { margin-bottom: 14px; }
+  ul, ol { margin: 8px 0 16px 24px; }
+  li { margin-bottom: 6px; }
+  strong { color: #fff; }
+  code { background: var(--surface); padding: 2px 6px; border-radius: 4px; font-size: 0.85rem; }
+  pre { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; overflow-x: auto; margin: 12px 0; font-size: 0.85rem; }
+
+  table { width: 100%; border-collapse: collapse; margin: 16px 0; background: var(--surface); border-radius: var(--radius); overflow: hidden; }
+  th { text-align: left; padding: 10px 14px; background: rgba(255,255,255,0.03); color: var(--muted); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; }
+  td { padding: 10px 14px; border-top: 1px solid var(--border); font-size: 0.9rem; }
+
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: 600; }
+  .badge-p0 { background: rgba(255,82,82,0.15); color: var(--red); }
+  .badge-p1 { background: rgba(255,215,64,0.15); color: var(--yellow); }
+  .badge-p2 { background: rgba(0,230,118,0.15); color: var(--green); }
+  .badge-live { background: rgba(0,230,118,0.15); color: var(--green); }
+  .badge-wip { background: rgba(255,215,64,0.15); color: var(--yellow); }
+  .badge-stub { background: rgba(68,138,255,0.15); color: var(--blue); }
+
+  .callout {
+    background: var(--surface); border-left: 3px solid var(--cyan);
+    border-radius: 0 var(--radius) var(--radius) 0; padding: 16px 20px; margin: 16px 0;
+  }
+  .callout.warn { border-left-color: var(--yellow); }
+  .callout.danger { border-left-color: var(--red); }
+
+  footer {
+    text-align: center; padding: 48px 24px; border-top: 1px solid var(--border);
+    color: var(--muted); font-size: 0.85rem;
+  }
+  footer a { color: var(--cyan); text-decoration: none; }
+
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+  /* ═══════════════════════════════════════════════
+     Responsive — Mobile · Tablet · Desktop · Wide
+     ═══════════════════════════════════════════════ */
+
+  /* Tablet (481–768px) */
+  @media (max-width: 768px) {
+    nav .inner { gap: 14px; height: 48px; overflow-x: auto; }
+    nav a { font-size: 0.8rem; white-space: nowrap; }
+    main { padding: 32px 18px; }
+    h1 { font-size: 1.6rem; }
+    h2 { font-size: 1.2rem; }
+    .subtitle { font-size: 0.85rem; }
+    .doc-grid, .two-col, .tracks-grid { grid-template-columns: 1fr; }
+    .summary-grid { grid-template-columns: repeat(2, 1fr); }
+    pre { font-size: 0.78rem; padding: 12px; overflow-x: auto; }
+    table { font-size: 0.8rem; display: block; overflow-x: auto; }
+    th, td { padding: 8px 10px; white-space: nowrap; }
+    footer { padding: 28px 18px; font-size: 0.8rem; }
+  }
+
+  /* Mobile (< 481px) */
+  @media (max-width: 480px) {
+    nav .inner { gap: 10px; height: 44px; padding: 0 4px; }
+    nav a { font-size: 0.72rem; padding: 4px 2px; }
+    nav .brand { font-size: 0.9rem; }
+    main { padding: 24px 12px; }
+    h1 { font-size: 1.4rem; }
+    h2 { font-size: 1.1rem; margin-top: 32px; }
+    h3 { font-size: 0.95rem; }
+    p, li { font-size: 0.85rem; }
+    pre { font-size: 0.7rem; padding: 10px; max-width: 100vw; overflow-x: scroll; }
+    code { font-size: 0.75rem; word-break: break-all; }
+    table { font-size: 0.7rem; }
+    th, td { padding: 6px 8px; }
+    .badge { font-size: 0.65rem; padding: 2px 6px; }
+    .callout { padding: 12px 14px; margin: 12px 0; }
+    .scenario-detail { grid-template-columns: 1fr !important; }
+    .scen-row { grid-template-columns: 1fr auto auto !important; padding: 10px 12px; gap: 6px; font-size: 0.78rem; }
+    .stats-bar { grid-template-columns: repeat(2, 1fr); gap: 6px; }
+    .stat-mini { padding: 10px; }
+    .stat-mini .val { font-size: 1.1rem; }
+    .pipe-step { min-width: 55px !important; padding: 6px 8px !important; }
+    .pipe-step .se { font-size: 0.65rem; }
+    .pip-arr { display: none; }
+    .log-box { max-height: 200px; font-size: 0.7rem; }
+    .controls { gap: 6px; }
+    .btn { padding: 10px 14px; font-size: 0.78rem; min-height: 40px; }
+    footer { padding: 20px 12px; font-size: 0.7rem; }
+    footer p { flex-wrap: wrap; gap: 6px; justify-content: center; }
+  }
+
+  /* Wide (> 1400px) — comfortable reading width */
+  @media (min-width: 1400px) {
+    main { max-width: 960px; }
+  }
+
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="inner">
+    <a href="index-zh.html" class="brand">PayGlass</a>
+    <a href="product-zh.html" class="active">产品定义书</a>
+    <a href="docs-zh.html">技术文档</a>
+    <a href="demo-zh.html">Demo</a>
+    <a href="dashboard/">Dashboard</a>
+  </div>
+</nav>
+
+<main>
+<h1>📄 产品定义说明书</h1>
+<p class="subtitle">v0.1.0 · 2026-06-06 · 更新版<br><em>PayGlass 是 PayRoute 控制面的观测组件。</em> 一面玻璃看尽所有 Agent 支付流量——路由 + 合规 + 风控 + 观测融合。</p>
+<div class="callout" style="margin-bottom:24px;">
+  <strong>🔗 PayGlass</strong> 是 <strong>PayRoute Control Plane</strong> 的可观测性切入点。<br>
+  从 PayGlass 免费观测开始，自然进化到 PayRoute 全栈路由决策层。<br>
+  <a href="https://jasoneip01-pixel.github.io/payroute/product-zh.html" style="color:var(--cyan);">→ 查看 PayRoute 产品说明（中文版）</a>
+</div>
+
+<!-- 1 -->
+<h2>1. 产品定位</h2>
+
+<h3>1.1 是什么</h3>
+<p>PayGlass 是跨协议 Agent 支付可观测性引擎。它<strong>不在支付流中</strong>（不处理资金），而是<strong>在支付流之上</strong>（观测、追踪、诊断）。</p>
+
+<pre>Agent 支付栈
+┌──────────────────────────────────────┐
+│            PayGlass                   │  ← 我们在这里：观测层
+│   Dashboard · Tracer · Observers      │
+├──────────────────────────────────────┤
+│  Stripe SPT  │  x402  │  Circle Nano │  ← 协议层
+├──────────────────────────────────────┤
+│  Card/ACH    │  USDC  │  USDC        │  ← 结算层
+└──────────────────────────────────────┘</pre>
+
+<h3>1.2 不是什么</h3>
+<ul>
+  <li>❌ 不是支付协议——不处理资金流</li>
+  <li>❌ 不是支付网关——不托管私钥</li>
+  <li>❌ 不是合规工具——不需要牌照</li>
+  <li>❌ 不是 Stripe/x402/Circle 的竞争对手——是它们的观测层</li>
+</ul>
+
+<div class="callout">
+  <strong>核心隐喻：</strong>Datadog 让 DevOps 在一面玻璃上看所有服务的健康状态。PayGlass 让 Agent 开发者在一面玻璃上看所有支付的状态。
+</div>
+
+<div class="callout danger">
+  <strong>⚠️ 2026 年 5 月最新研究指出：</strong><br>
+  x402 类 Agent 支付存在<strong>授权绑定不足、重放攻击、并发竞态、动态定价超标</strong>等安全风险<br>
+  （arXiv:2605.11781 · arXiv:2605.30998）<br>
+  这些风险 Etherscan 看不见，普通 HTTP 日志也看不见。<strong>PayGlass 的 trace 设计本身就是安全审计层。</strong>
+</div>
+
+<!-- 2 -->
+<h2>2. 问题陈述</h2>
+
+<h3>2.1 市场现状：三条轨道并行，无人观测</h3>
+<table>
+  <thead><tr><th>轨道</th><th>建设者</th><th>状态</th><th>核心创新</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Stripe Agent OS</strong></td><td>Stripe</td><td><span class="badge badge-wip">Private Preview</span></td><td>从支付处理器进化为 Agent 商业 OS</td></tr>
+    <tr><td><strong>x402 Protocol</strong></td><td>开放标准社区</td><td><span class="badge badge-live">已发布</span></td><td>HTTP 原生支付，无账户无会话</td></tr>
+    <tr><td><strong>Circle Nanopayments</strong></td><td>Circle</td><td><span class="badge badge-live">主网 2026-05</span></td><td>Gas-free USDC 微支付，$0.000001 起</td></tr>
+  </tbody>
+</table>
+<p>三条轨道的共同特征：<strong>都在建，都还没人做观测</strong>。</p>
+
+<h3>2.2 开发者的五大痛点</h3>
+<table>
+  <thead><tr><th>痛点</th><th>现状</th><th>PayGlass 解法</th></tr></thead>
+  <tbody>
+    <tr><td><strong>协议选型瘫痪</strong></td><td>3 个协议，各有优劣，不知道选哪个</td><td>三轨统一 Dashboard，同屏对比延迟/成本/错误率</td></tr>
+    <tr><td><strong>支付流黑箱</strong></td><td>EIP-3009 签名→TEE 验证→批量结算，6+ 步中间态，任何一步失败都是黑箱</td><td>逐事件追踪，可视化管线，精确定位失败点</td></tr>
+    <tr><td><strong>跨链不可见</strong></td><td>11 条链+3 个网关，一笔支付跨链后消失在黑洞里</td><td>跨链追踪，batch→tx→confirmation 全链路可见</td></tr>
+    <tr><td><strong>支付安全盲区</strong></td><td>重放攻击、重复支付、paid-but-denied、allowance 超标——Etherscan 看不到，日志也看不到</td><td>内置安全检测引擎，自动标记 replay/duplicate/anomaly</td></tr>
+    <tr><td><strong>协议性能无从对比</strong></td><td>x402 delay vs Circle Nano delay vs Stripe MPP delay——没有客观数据</td><td>跨协议 benchmark，延迟/失败率/结算时长实时对比</td></tr>
+  </tbody>
+</table>
+
+<h3>2.3 为什么现在</h3>
+<div class="callout warn">
+  <strong>窗口判断：12-18 个月。</strong><br>
+  Stripe SPT 还在 private preview（2026 Q3 前不会公开）· x402 协议刚稳定，生态在早期 · Circle Nanopayments 5 月才上主网 · <strong>碎片化峰值 = PayGlass 最大窗口</strong>
+</div>
+
+<!-- 3 -->
+<h2>3. 目标用户</h2>
+<table>
+  <thead><tr><th>画像</th><th>描述</th><th>痛点</th><th>获取渠道</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Agent 框架开发者</strong></td><td>在 LangChain/CrewAI/OpenClaw 上构建 Agent，需集成支付</td><td><span class="badge badge-p0">高</span></td><td>x402 Discord, GitHub, Agent 社区</td></tr>
+    <tr><td><strong>API/算力服务商</strong></td><td>通过 Agent 支付出售 API 调用/推理算力的服务商</td><td><span class="badge badge-p1">中</span></td><td>Stripe 生态, MPP 文档</td></tr>
+    <tr><td><strong>Web3 支付工程师</strong></td><td>熟悉 USDC/EIP-3009，构建 Agent-to-Agent 支付场景</td><td><span class="badge badge-p1">中</span></td><td>Circle 开发者社区</td></tr>
+    <tr><td><strong>DevOps/SRE</strong></td><td>运维 Agent 系统，需要支付可靠性监控</td><td><span class="badge badge-p2">低</span></td><td>Datadog/Grafana 生态</td></tr>
+  </tbody>
+</table>
+
+<!-- 4 -->
+<h2>4. 竞争格局</h2>
+<table>
+  <thead><tr><th></th><th>观测范围</th><th>协议覆盖</th><th>资金处理</th><th>牌照需求</th></tr></thead>
+  <tbody>
+    <tr><td><strong>PayGlass</strong></td><td>全部</td><td>x402 + Nano + SPT</td><td>❌ 不碰</td><td>❌ 无</td></tr>
+    <tr><td>Stripe Dashboard</td><td>Stripe 交易</td><td>仅 SPT</td><td>✅ 处理</td><td>✅ 需要</td></tr>
+    <tr><td>Circle Gateway</td><td>仅 Nano</td><td>仅 Nanopayments</td><td>✅ 处理</td><td>✅ 需要</td></tr>
+    <tr><td>Etherscan</td><td>链上交易</td><td>全部链上</td><td>❌ 不碰</td><td>❌ 无</td></tr>
+  </tbody>
+</table>
+
+<div class="callout">
+  <strong>PayGlass 的差异化：</strong>Etherscan 能看到链上结算，但看不到链下的签名→验证→批量过程。PayGlass 覆盖的是 EIP-3009 签名到链上结算之间的<strong>灰色地带</strong>——这是 Etherscan 盲区，也是开发者最痛的调试区。
+</div>
+
+<h3>4.2 威胁与应对</h3>
+<table>
+  <thead><tr><th>威胁</th><th>概率</th><th>影响</th><th>应对</th></tr></thead>
+  <tbody>
+    <tr><td>Stripe 把观测做到 MPP 里</td><td>中</td><td>高</td><td>不被锁定在 Stripe 生态——跨协议是护城河</td></tr>
+    <tr><td>Circle Gateway 开源观测模块</td><td>低</td><td>中</td><td>单协议观测≠跨协议，碎片化越严重我们越有价值</td></tr>
+    <tr><td>AWS AgentCore 自带监控</td><td>中</td><td>中</td><td>云厂商监控是基础设施级，不是应用级——支付流可视化更上层</td></tr>
+  </tbody>
+</table>
+
+<!-- 5 -->
+<h2>5. 产品架构</h2>
+<pre>┌────────────────────────────────────────┐
+│          Dashboard (HTML/Web)           │  ← 展示层
+│   Stats · Tracks · Pipeline · Traces   │
+├────────────────────────────────────────┤
+│          PayGlass Tracer (Python)       │  ← 引擎层
+│   Unified TraceEvent · Aggregation     │
+├──────────┬──────────┬─────────────────┤
+│  SPT Obs │ x402 Obs │  Nano Obs       │  ← 协议适配层
+│  (stub)  │ EIP-3009 │  Gateway+TEE    │
+└──────────┴──────────┴─────────────────┘</pre>
+
+<h3>5.2 核心数据模型</h3>
+<pre>TraceEvent {
+  trace_id:      唯一追踪 ID
+  protocol:      x402 | circle-nanopayments | stripe-spt
+  event_type:    signature | verification | batch | settlement
+  status:        pending → verified → batched → settled
+  amount_usdc:   金额（统一 USDC 计价）
+  source_agent:  付款 Agent 标识
+  target_service:收款方/资源 URL
+  chain:         区块链
+  tx_hash:       交易哈希
+  batch_id:      批次 ID
+  risk_flags:    [replay? | duplicate? | allowance_overdraft? | binding_mismatch?]
+}</pre>
+
+<h3>5.3 标准仪表化（OpenTelemetry 兼容）</h3>
+<p>PayGlass 不只是 Dashboard——它是标准化的支付仪表化层：</p>
+<pre>payglass.trace()        # 创建支付追踪
+payglass.middleware()   # 自动截获 HTTP/Webhook
+payglass.collector()    # 汇聚 TraceEvent
+payglass.exporter()     # 导出至 OTEL/自有 Dashboard
+payglass.dashboard()    # Web UI</pre>
+<div class="callout">
+  <strong>设计原则：</strong>兼容 OpenTelemetry，进入现有 DevOps 栈。这工具不是新习惯，而是已有观测体系的 <strong>payment extension</strong>。
+</div>
+
+<!-- 6 -->
+<h2>6. 功能路线图</h2>
+
+<h3>v0.1.0 <span class="badge badge-live">当前 · 2026-06-05</span></h3>
+<ul>
+  <li>✅ 统一 TraceEvent 数据模型</li>
+  <li>✅ x402 协议观测器（完整 7 事件流）</li>
+  <li>✅ Circle Nanopayments 观测器（含验证闸门）</li>
+  <li>✅ Stripe SPT 观测器（stub）</li>
+  <li>✅ Circle Skill (SKILL.md)</li>
+  <li>✅ 三轨统一 Dashboard (HTML)</li>
+  <li>✅ 8 场景 Demo</li>
+</ul>
+
+<h3>v0.2.0 <span class="badge badge-wip">2026 Q3</span></h3>
+<ul>
+  <li><strong>Python / Node.js middleware</strong> — 三行代码接入支付追踪</li>
+  <li><strong>真实 x402 live trace</strong> — 直接截获 HTTP 402 握手与 EIP-3009 签名</li>
+  <li><strong>Circle Gateway Webhook 接收器</strong> — 实时结算事件 + TEE 验证</li>
+  <li>Stripe SPT 真实集成 — public beta 发布后接入</li>
+  <li><strong>OpenTelemetry Exporter</strong> — 兼容现有 DevOps Stack</li>
+  <li><strong>Trace Replay</strong> — 历史支付流时间轴回放</li>
+  <li><strong>CLI: <code>payglass trace &lt;payment_id&gt;</code></strong> — 终端查支付流</li>
+  <li><strong>Error Taxonomy</strong> — 结构化错误分类：signature_failed / verification_rejected / batch_stuck / settlement_timeout</li>
+</ul>
+
+<h3>v0.3.0 <span class="badge badge-stub">2026 Q4</span></h3>
+<ul>
+  <li><strong>告警规则引擎</strong> — Slack / Discord / Webhook 实时告警</li>
+  <li><strong>安全风控检测</strong> — 自动标记 replay / duplicate / nonce stale / binding mismatch</li>
+  <li><strong>批量结算卡住检测</strong> — batch pending over threshold → 自动告警</li>
+  <li><strong>Paid-but-denied / Unpaid-but-served 检测</strong> — 状态不一致自动识别</li>
+  <li><strong>跨协议 Benchmark 页</strong> — 公开延迟/失败率/结算时长排行</li>
+  <li><strong>Agent 支付行为基线</strong> — 按 Agent 的消费模式异常检测</li>
+  <li>Hosted demo with real sample traces</li>
+</ul>
+
+<h3>v1.0.0 <span class="badge badge-stub">2027 Q1</span></h3>
+<ul>
+  <li><strong>多租户 SaaS</strong> — Agent 团队各自独立 Dashboard</li>
+  <li><strong>Enterprise Self-hosted</strong> — 私有部署，自定义协议适配器</li>
+  <li><strong>Protocol Scorecard</strong> — 跨协议费率对比 + 路由推荐 API</li>
+  <li><strong>SLA Reports</strong> — 按服务商/协议的可用性合规报告</li>
+  <li><strong>Security Audit Mode</strong> — 一站式支付安全审计报告</li>
+</ul>
+
+<h3>不会做的 <span class="badge badge-p0">自觉边界</span></h3>
+<p>❌ 不建支付协议 · ❌ 不处理资金 · ❌ 不托管钱包 · ❌ 不做合规桥</p>
+
+<!-- 7 -->
+<h2>7. 安全风控：不只是看得见，而是识别危险</h2>
+
+<div class="callout danger">
+  <strong>核心洞察——这才是 PayGlass 的真正付费点：</strong><br>
+  免费用户看 Dashboard，付费用户买 <strong>Risk Alerts / Security Audit / Anomaly Detection</strong>。<br>
+  支付的观测数据就是安全审计数据——同一份数据，两个价格点。
+</div>
+
+<p>2026 年 5 月两项独立研究揭示了 x402 类 Agent 支付的系统性安全风险。PayGlass 的观测层天然具备捕捉这些风险的能力。</p>
+
+<h3>7.1 PayGlass 能检测的风险</h3>
+<table>
+  <thead><tr><th>风险类型</th><th>描述</th><th>检测方法</th><th>严重度</th></tr></thead>
+  <tbody>
+    <tr><td><strong>🔁 重放攻击</strong></td><td>同一签名被多次提交</td><td>nonce 重复检测</td><td><span class="badge badge-p0">高</span></td></tr>
+    <tr><td><strong>🔄 重复支付</strong></td><td>同一支付意图触发多次结算</td><td>trace_id 唯一性验证</td><td><span class="badge badge-p0">高</span></td></tr>
+    <tr><td><strong>⛔ Paid-but-Denied</strong></td><td>签名已确认但资源未交付</td><td>签名事件 → 无交付事件检测</td><td><span class="badge badge-p0">高</span></td></tr>
+    <tr><td><strong>👻 Unpaid-but-Served</strong></td><td>资源已交付但无对应付款</td><td>资源交付 → 无对应签名事件检测</td><td><span class="badge badge-p0">高</span></td></tr>
+    <tr><td><strong>🔗 绑定不匹配</strong></td><td>签名绑定的资源与交付的资源不一致</td><td>EIP-3009 request-binding 字段验证</td><td><span class="badge badge-p0">高</span></td></tr>
+    <tr><td><strong>🧊 批量结算卡住</strong></td><td>Batch pending 超过阈值</td><td>batch_id 到 tx_hash 时间窗口监控</td><td><span class="badge badge-p1">中</span></td></tr>
+    <tr><td><strong>💰 Allowance 超标</strong></td><td>动态定价导致实际扣减超出授权额度</td><td>allowance override 检测</td><td><span class="badge badge-p1">中</span></td></tr>
+    <tr><td><strong>📊 并发竞态</strong></td><td>同一资源被多笔支付同时请求</td><td>target_service 并发计数器</td><td><span class="badge badge-p2">低</span></td></tr>
+  </tbody>
+</table>
+
+<h3>7.2 为什么别人做不到</h3>
+<table>
+  <thead><tr><th>工具</th><th>为什么看不到</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Etherscan</strong></td><td>只看链上 tx_hash，看不到链下签名→验证→批量过程</td></tr>
+    <tr><td><strong>Stripe Dashboard</strong></td><td>只看 Stripe 内部，看不到 x402 / Circle Nano</td></tr>
+    <tr><td><strong>HTTP 日志</strong></td><td>只记录请求/响应，看不到跨协议的完整状态机</td></tr>
+    <tr><td><strong>Prometheus + Grafana</strong></td><td>只能自定义监控指标，无法追踪单笔支付语义</td></tr>
+  </tbody>
+</table>
+
+<div class="callout">
+  <strong>网络效应壁垒：</strong>PayGlass 沉淀跨协议性能基准数据——x402 在 Base 的结算耗时分布、Circle Nano 在 11 条链的稳定性排名、哪些 Gateway 重复失败率高、哪些 Agent 消费行为异常。<strong>这就是从工具到 intelligence layer 的路径。</strong>
+</div>
+
+<!-- 8 -->
+<h2>8. 商业模型</h2>
+<table>
+  <thead><tr><th>层</th><th>模式</th><th>价格锚点</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Free</strong></td><td>单开发者，10K 支付/月，社区支持</td><td>$0</td></tr>
+    <tr><td><strong>Team</strong></td><td>5 人团队，100K 支付/月，Slack 支持</td><td>$49/月</td></tr>
+    <tr><td><strong>Pro</strong></td><td>无限支付 + 安全风控告警 + SLA 监控 + SSO</td><td>$199/月</td></tr>
+    <tr><td><strong>Enterprise</strong></td><td>私有部署 + 安全审计报告 + SLA 合规报告 + 自定义协议适配器</td><td>议价 ($5K+/月)</td></tr>
+  </tbody>
+</table>
+
+<div class="callout warn">
+  <strong>⚠️ 商业模式前景判断：$49/月和 $199/月可以教育市场，但不是终点。</strong><br>
+  真正有价值的商业需求是：Enterprise self-hosted + Security Audit + Protocol Performance Benchmarking + Compliance Evidence Export。<br>
+  PayGlass 的定位是<strong>先做开发者工具（社区→品牌），再做安全审计平台（收入→壁垒）</strong>。
+</div>
+
+<h3>8.2 从工具到公司的演进路径</h3>
+<table>
+  <thead><tr><th>阶段</th><th>定位</th><th>收入主力</th><th>估值逻辑</th></tr></thead>
+  <tbody>
+    <tr><td><strong>v0.1–v0.2</strong></td><td>开源调试工具</td><td>$0</td><td>社区验证</td></tr>
+    <tr><td><strong>v0.3</strong></td><td>SaaS Dashboard</td><td>$49–$199/月</td><td>开发者基础设施 (10-15× ARR)</td></tr>
+    <tr><td><strong>v1.0</strong></td><td>安全与可靠性平台</td><td>$5K+/月 Enterprise</td><td>安全工具 (15-20× ARR)</td></tr>
+    <tr><td><strong>v2.0</strong></td><td>Agent Payment Intelligence</td><td>Benchmark + Data License</td><td>平台溢价</td></tr>
+  </tbody>
+</table>
+
+<!-- 9 -->
+<h2>9. 分发策略</h2>
+<table>
+  <thead><tr><th>渠道</th><th>策略</th><th>时间</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Circle Skills 市场</strong></td><td>作为 Circle Skill 分发 — Agent 开发者一键安装</td><td>立即</td></tr>
+    <tr><td><strong>x402 社区</strong></td><td>x402 Discord/GitHub 的"推荐调试工具"</td><td>v0.2</td></tr>
+    <tr><td><strong>Stripe 生态</strong></td><td>SPT 公开后，作为 SPT 的观测插件</td><td>SPT GA 时</td></tr>
+    <tr><td><strong>OpenTelemetry 生态</strong></td><td>通过 OTEL exporter 嵌入现有 DevOps 栈</td><td>v0.2</td></tr>
+  </tbody>
+</table>
+
+<!-- 10 -->
+<h2>10. 风险与应对</h2>
+<table>
+  <thead><tr><th>风险</th><th>等级</th><th>应对</th></tr></thead>
+  <tbody>
+    <tr><td>窗口关闭（Stripe/Circle 统一底层）</td><td><span class="badge badge-p0">高</span></td><td>12-18 个月内建立开发者心智——"调试 Agent 支付 = PayGlass"</td></tr>
+    <tr><td>市场太小（Agent 支付还没规模）</td><td><span class="badge badge-p1">中</span></td><td>免费层 + 社区驱动，等到 2027 年第一批付费用户</td></tr>
+    <tr><td><strong>被巨头"插件化"</strong></td><td><span class="badge badge-p0">高</span></td><td><strong>不做单一协议的 Dashboard。</strong> 通过开源 SDK + OTEL 兼容 + 自建 Collector 保持独立性。</td></tr>
+    <tr><td>Veridex 加 Dashboard</td><td><span class="badge badge-p1">中</span></td><td>先做安全层——Veridex 协议抽象 + Dashboard ≠ 安全审计 + 异常检测</td></tr>
+    <tr><td>x402 被边缘化</td><td><span class="badge badge-p1">中</span></td><td>协议无关设计——新协议出现，加一个 Observer 即可</td></tr>
+    <tr><td>合规要求变化</td><td><span class="badge badge-p2">低</span></td><td>不处理资金 = 不受支付牌照约束</td></tr>
+  </tbody>
+</table>
+
+<!-- 10 -->
+<h2>10. 产品原则</h2>
+<ol>
+  <li><strong>不选边。</strong> PayGlass 不给任何协议背书。观测一切，推荐零。</li>
+  <li><strong>不可见即不存在。</strong> 支付流中的每一个中间态都必须可见。</li>
+  <li><strong>开发者优先。</strong> 产品体验从 CLI 开始，不是从销售演示开始。</li>
+  <li><strong>免费层必须真的好用。</strong> 如果免费层是残废的，品类教育不会发生。</li>
+  <li><strong>不碰资金。</strong> 这是护城河，也是安全边界。</li>
+</ol>
+
+<!-- Appendix -->
+<h2>附录 A：术语表</h2>
+<table>
+  <thead><tr><th>术语</th><th>定义</th></tr></thead>
+  <tbody>
+    <tr><td>EIP-3009</td><td>以太坊改进提案，允许离线签名授权 USDC 转账</td></tr>
+    <tr><td>TEE</td><td>可信执行环境，Circle Gateway 用 AWS Nitro Enclave 验证签名</td></tr>
+    <tr><td>Batch Settlement</td><td>批量结算：数千笔链下支付合并为一笔链上交易</td></tr>
+    <tr><td>MPP</td><td>Merchant Payment Protocol，Stripe 的 Agent 商户支付协议</td></tr>
+    <tr><td>SPT</td><td>Session Payment Token，Stripe 的 Agent 会话支付令牌</td></tr>
+    <tr><td>x402</td><td>HTTP 402 Payment Required 标准的 Agent 支付扩展</td></tr>
+    <tr><td>Circle Gateway</td><td>Circle 的统一流动性层，支撑 Nanopayments 的批量结算</td></tr>
+  </tbody>
+</table>
+
+<h2>附录 B：关键信号时间线</h2>
+<table>
+  <thead><tr><th>日期</th><th>信号</th></tr></thead>
+  <tbody>
+    <tr><td>2026-03-11</td><td>Circle Nanopayments 测试网上线</td></tr>
+    <tr><td>2026-05-03</td><td>Circle Nanopayments 主网上线</td></tr>
+    <tr><td>2026-05-08</td><td>Stripe Sessions 2026 — Agent OS 品类宣言</td></tr>
+    <tr><td>2026-05-12</td><td>Circle Agent Stack 发布（5 产品套件）</td></tr>
+    <tr><td>2026-05-27</td><td>Keyrock 报告：Agent 支付 $73M/176M 笔</td></tr>
+    <tr><td><strong>2026-06-05</strong></td><td><strong>PayGlass v0.1.0 发布</strong></td></tr>
+  </tbody>
+</table>
+
+</main>
+
+<footer>
+  <p>PayGlass v0.1.0 · Built for the agentic economy.</p>
+</footer>
+</body>
+</html>
